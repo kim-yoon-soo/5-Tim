@@ -505,7 +505,7 @@ int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	return maxval;
 }
 
-void play(int cpuval) {
+void play_single(int cpuval) {
 	Board * b = new Board();
 	int humanPlayer = -1*cpuval;
 	int cpuPlayer = cpuval;
@@ -515,7 +515,7 @@ void play(int cpuval) {
 
 	int row, col;
 
-	if (cpuPlayer == -1) { // cpu plays second
+	if (cpuPlayer == -1) { // cpu plays second: player = white, cpu = black
 		while(!b->full_board() && consecutivePasses<2) {
 			//check if player must pass:
 			if(!b->has_valid_move(humanPlayer)) {
@@ -548,7 +548,7 @@ void play(int cpuval) {
 			}
 		}
 	}
-	else { // cpu plays first
+	else { // cpu plays first: player = white, cpu = black
 		while(!b->full_board() && consecutivePasses<2) {
 			//move for computer:
 			if(b->full_board())
@@ -594,21 +594,117 @@ void play(int cpuval) {
 		cout << "Computer wins by " << abs(score) << endl;
 	else
 		cout << "Player wins by " << abs(score) << endl;
-	char a;
-	cin >> a;
+
+	return;
+}
+
+void play_multi(void) {
+	Board * b = new Board();
+
+	cout << b->toString();
+	int consecutivePasses = 0;
+
+	int row, col;
+
+	while(!b->full_board() && consecutivePasses<2) {
+		//check if player must pass:
+		cout << "Black's turn" << endl;
+		if(!b->has_valid_move(1)) {
+			cout << "You must pass." << endl;
+			consecutivePasses++;
+		}
+		else {
+			consecutivePasses = 0;
+			cout << "Your move row (1-8): ";
+			cin >> row;
+			cout << "Your move col (1-8): ";
+			cin >> col;
+			if(!b->play_square(row, col, 1)) {
+				cout << "Illegal move." << endl;
+				continue;
+			}
+			cout << b->toString();
+		}
+
+		//move for white:
+		cout << "White's turn" << endl;
+		if(!b->has_valid_move(-1)) {
+			cout << "You must pass." << endl;
+			consecutivePasses++;
+		}
+		else {
+			consecutivePasses = 0;
+			while (true) {
+				cout << "Your move row (1-8): ";
+				cin >> row;
+				cout << "Your move col (1-8): ";
+				cin >> col;
+				if(!b->play_square(row, col, -1)) {
+					cout << "Illegal move." << endl;
+					cout << "White's turn" << endl;
+				}
+				else
+					break;
+			}
+			cout << b->toString();
+		}
+	}
+
+	int score = b->score();
+	if(score==0)
+		cout << "Tie game." << endl;
+	else if(score > 0)
+		cout << "Black wins by " << abs(score) << endl;
+	else
+		cout << "White wins by " << abs(score) << endl;
+
+	return;
 }
 
 int main(int argc, char * argv[])
 {
-	cout << "Enter Y or y if you would like to go first." << endl;
 	char a;
-	cin >> a;
+	char re = 'Y';
 
-	if (a == 'y' || a == 'Y') {
-		play(-1); // our cpu's val is -1
+	while(re == 'Y' || re == 'y'){
+		cout << "Single play? (Y/N)" << endl;
+		cin >> a;
+	
+		while(a != 'Y' && a != 'y' && a != 'N' && a != 'n'){
+			cout << "Type Y or N." << endl;
+			cout << "Single play? (Y/N)" << endl;
+			cin >> a;
+		}
+	
+		if(a == 'Y' || a == 'y'){
+			cout << "Single play mode selected." << endl;
+			cout << "Do you want to go first?" << endl;
+			cin >> a;
+	
+			while(a != 'Y' && a != 'y' && a != 'N' && a != 'n'){
+				cout << "Type Y or N." << endl;
+				cout << "Do you want to go first? (Y/N)" << endl;
+				cin >> a;
+			}
+	
+			if (a == 'Y' || a == 'y') {
+				cout << "You are black." << endl;
+				play_single(-1); // our cpu's val is -1
+			}
+			else{
+				cout << "You are white." << endl;
+				play_single(1);
+			}
+		}
+		else{
+			cout << "Multi play mode selected." << endl;
+			cout << "Black goes first." << endl;
+			play_multi();
+		}
+
+		cout << "Re? (Y/N)" << endl;
+		cin >> re;
 	}
-	else
-		play(1);
 
 	return 0;
 }
