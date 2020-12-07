@@ -10,6 +10,7 @@
 using namespace std;
 
 class Board {
+protected:
 	int squares[8][8];
 
 public:
@@ -26,6 +27,7 @@ public:
 	int eval(int, int); //heuristic evaluation of a current board for use in mimimax
 	int free_neighbors(int, int);
 };
+
 
 pair<int, int> minimax_decision(Board *b, int cpuval);
 int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
@@ -505,6 +507,221 @@ int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	return maxval;
 }
 
+class Multi_Board : public Board {
+
+public:
+	Multi_Board();
+	string toString();
+	bool play_square(int, int, int);
+	bool move_is_valid(int, int, int);
+	bool check_or_flip_path(int, int, int, int, int, bool);
+	int get_square(int, int);
+	int score();
+	bool full_board();
+	bool has_valid_move(int);
+	void set_squares(Board* b);
+	int eval(int, int);
+	int free_neighbors(int, int);
+};
+
+Multi_Board::Multi_Board() {
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			squares[i][j] = 0;
+	squares[3][3] = -1;
+	squares[4][4] = -1;
+	squares[3][4] = 1;
+	squares[4][3] = 1;
+}
+
+string Multi_Board::toString() {
+	stringstream s;
+	char cforvalplusone[] = { 'W', '_', 'B' };
+	s << "  1 2 3 4 5 6 7 8" << endl;
+	for (int i = 0; i < 8; i++) {
+		s << i + 1 << '|';
+		for (int j = 0; j < 8; j++)
+			s << cforvalplusone[squares[i][j] + 1] << '|';
+		s << endl;
+	}
+	return s.str();
+}
+
+bool Multi_Board::has_valid_move(int val) {
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			if (move_is_valid(i + 1, j + 1, val))
+				return true;
+	return false;
+}
+
+bool Multi_Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
+	int pathr = r + rinc;
+	int pathc = c + cinc;
+	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val)
+		return false;
+	//check for some chip of val's along the path:
+	while (true) {
+		pathr += rinc;
+		pathc += cinc;
+		if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] == 0)
+			return false;
+		if (squares[pathr][pathc] == val) {
+			if (doFlips) {
+				pathr = r + rinc;
+				pathc = c + cinc;
+				while (squares[pathr][pathc] != val) {
+					squares[pathr][pathc] = val;
+					pathr += rinc;
+					pathc += cinc;
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Multi_Board::move_is_valid(int row, int col, int val) {
+	int r = row - 1;
+	int c = col - 1;
+	if (r < 0 || r > 7 || c < 0 || c > 7)
+		return false;
+	if (squares[r][c] != 0)
+		return false;
+	for (int rinc = -1; rinc <= 1; rinc++)
+		for (int cinc = -1; cinc <= 1; cinc++) {
+			if (check_or_flip_path(r, c, rinc, cinc, val, false))
+				return true;
+		}
+	return false;
+}
+
+bool Multi_Board::play_square(int row, int col, int val) {
+	if (!move_is_valid(row, col, val))
+		return false;
+	squares[row - 1][col - 1] = val;
+	for (int rinc = -1; rinc <= 1; rinc++)
+		for (int cinc = -1; cinc <= 1; cinc++) {
+			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true);
+		}
+	return true;
+}
+
+bool Multi_Board::full_board() {
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			if (squares[i][j] == 0)
+				return false;
+	return true;
+}
+int Multi_Board::score() {
+	int sum = 0;
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			sum += squares[i][j];
+	return sum;
+}
+
+int Multi_Board::get_square(int row, int col) {
+	return squares[row - 1][col - 1];
+}
+
+void Multi_Board::set_squares(Board* b) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			squares[i][j] = b->get_square(i + 1, j + 1);
+		}
+	}
+}
+
+int Multi_Board::eval(int cpuval, int depth) {
+
+	int score = 0; // evaluation score
+
+	// count available moves for computer and player
+	int mc = 0; int mp = 0;
+	for (int i = 1; i < 9; i++) {
+		for (int j = 1; j < 9; j++) {
+			if (move_is_valid(i, j, cpuval))
+				mc++;
+			if (move_is_valid(i, j, -1 * cpuval))
+				mp++;
+		}
+	}
+
+	score += 20 * (mc - mp); // the number is just some scale determined through playing
+	
+
+	int cc = 0; int cp = 0;
+	if (get_square(1, 1) == cpuval)
+		cc++;
+	else if (get_square(1, 1) == -1 * cpuval)
+		cp++;
+
+	if (get_square(1, 8) == cpuval)
+		cc++;
+	else if (get_square(1, 8) == -1 * cpuval)
+		cp++;
+
+	if (get_square(8, 1) == cpuval)
+		cc++;
+	else if (get_square(8, 1) == -1 * cpuval)
+		cp++;
+
+	if (get_square(8, 8) == cpuval)
+		cc++;
+	else if (get_square(8, 8) == -1 * cpuval)
+		cp++;
+
+	score += 200 * (cc - cp);
+
+	
+
+	// limit the amount of space around our pieces so we don't surround as much (which leads to big gains endgame for opponent)
+	int sc = 0; int sp = 0; // counts for open spaces neighboring a player/comp's pieces
+	for (int i = 1; i < 9; i++) {
+		for (int j = 1; j < 9; j++) {
+			if (get_square(i, j) == cpuval) {
+				//add count to sc
+				sc += free_neighbors(i, j);
+			}
+			if (get_square(i, j) == -1 * cpuval) {
+				//add count to sp
+				sp += free_neighbors(i, j);
+			}
+		}
+	}
+
+	score -= 10 * (sc - sp); // subtract because we are trying to minimize it
+	return score;
+}
+
+int Multi_Board::free_neighbors(int i, int j) {
+	int count = 0;
+
+	// examine the 8 possible neighborings unless not possible positions
+	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && get_square(i + 1, j) == 0)
+		count++;
+	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && get_square(i + 1, j - 1) == 0)
+		count++;
+	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && get_square(i, j - 1) == 0)
+		count++;
+	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && get_square(i - 1, j - 1) == 0)
+		count++;
+	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && get_square(i - 1, j) == 0)
+		count++;
+	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && get_square(i - 1, j + 1) == 0)
+		count++;
+	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && get_square(i, j + 1) == 0)
+		count++;
+	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && get_square(i + 1, j + 1) == 0)
+		count++;
+
+	return count;
+
+}
+
 void play_single(int cpuval) {
 	Board * b = new Board();
 	int humanPlayer = -1*cpuval;
@@ -599,7 +816,7 @@ void play_single(int cpuval) {
 }
 
 void play_multi(void) {
-	Board * b = new Board();
+	Multi_Board * b = new Multi_Board();
 
 	cout << b->toString();
 	int consecutivePasses = 0;
