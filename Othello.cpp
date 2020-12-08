@@ -1,5 +1,5 @@
 // Othello.cpp : Defines the entry point for the console application.
-//
+// hi
 
 #include<iostream>
 #include<sstream>
@@ -516,6 +516,7 @@ class Multi_Board : public Board {
 public:
 	Multi_Board();
 	void toString();
+	void Chance_Placing();
 	bool play_square(int, int, int);
 	bool move_is_valid(int, int, int);
 	bool check_or_flip_path(int, int, int, int, int, bool);
@@ -551,9 +552,26 @@ void Multi_Board::toString() {
 			cout << "__"<< '|';
 			if(squares[i][j] == 1)
 			cout << "●" << '|';
+			if(squares[i][j] == 2)
+			cout << "??" << '|';
 		}
 		cout << endl;
 	}
+}
+void Multi_Board::Chance_Placing()
+{
+	int chance_row,chance_col;
+	
+	cout << "Where do you want to set chance card1 row: ";
+	cin >> chance_row;
+	cout << "Where do you want to set chance card1 col: ";
+	cin >> chance_col;
+	squares[chance_row-1][chance_col-1] = 2;
+	cout << "Where do you want to set chance card2 row: ";
+	cin >> chance_row;
+	cout << "Where do you want to set chance card2 col: ";
+	cin >> chance_col;
+	squares[chance_row-1][chance_col-1] = 2;
 }
 
 bool Multi_Board::has_valid_move(int val) {
@@ -826,12 +844,13 @@ void play_single(int cpuval) {
 
 void play_multi(void) {
 	Multi_Board * b = new Multi_Board();
-
+	b->Chance_Placing();
+	cout << "Black goes first." << endl;
 	b->toString();
 	int consecutivePasses = 0;
 
 	int row, col;
-
+	
 	while(!b->full_board() && consecutivePasses<2) {
 		//check if player must pass:
 		cout << "Black's turn" << endl;
@@ -924,7 +943,6 @@ int main(int argc, char * argv[])
 		}
 		else{
 			cout << "Multi play mode selected." << endl;
-			cout << "Black goes first." << endl;
 			play_multi();
 		}
 
