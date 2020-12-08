@@ -1,11 +1,11 @@
 // Othello.cpp : Defines the entry point for the console application.
 // hi
 
-#include<iostream>
-#include<sstream>
-#include<ctime>
-
-#include<string>
+#include <iostream>
+#include <sstream>
+#include <ctime>
+#include <random>
+#include <string>
 
 using namespace std;
 
@@ -512,11 +512,19 @@ int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 }
 
 class Multi_Board : public Board {
+private:
+	int mode; // 0: normal mode, 1: chance mode
+	int goods;
+	int good_coor[6]; //(row, col, color) * 2
 
 public:
 	Multi_Board();
+	void Mode_select();
 	void toString();
 	void Chance_Placing();
+	void Good_chance(int, int, int);
+	void Check_good();
+	void Bad_chance(int, int, int);
 	bool play_square(int, int, int);
 	bool move_is_valid(int, int, int);
 	bool check_or_flip_path(int, int, int, int, int, bool);
@@ -537,6 +545,25 @@ Multi_Board::Multi_Board() {
 	squares[4][4] = -1;
 	squares[3][4] = 1;
 	squares[4][3] = 1;
+
+	mode = 0; //default
+	goods = 0;
+}
+
+void Multi_Board::Mode_select() {
+	string a;
+	cout << "Need chances? (Y/N)" << endl;
+	cin >> a;
+
+	if(a == "Y" || a == "y"){
+		mode = 1;
+		cout << "Chance mode selected." << endl;
+		Chance_Placing();
+	}
+	else{
+		mode = 0;
+		cout << "Normal mode selected." << endl;
+	}
 }
 
 void Multi_Board::toString() {
@@ -547,19 +574,18 @@ void Multi_Board::toString() {
 		for (int j = 0; j < 8; j++)
 		{
 			if(squares[i][j] == -1)
-			cout << "○" << '|';
+			cout << "●" << '|'; //white
 			if(squares[i][j] == 0)
 			cout << "__"<< '|';
 			if(squares[i][j] == 1)
-			cout << "●" << '|';
+			cout << "○" << '|'; //black
 			if(squares[i][j] == 2)
 			cout << "??" << '|';
 		}
 		cout << endl;
 	}
 }
-void Multi_Board::Chance_Placing()
-{
+void Multi_Board::Chance_Placing() {
 	int chance_row,chance_col;
 	
 	cout << "Where do you want to set chance card1 row: ";
@@ -567,11 +593,42 @@ void Multi_Board::Chance_Placing()
 	cout << "Where do you want to set chance card1 col: ";
 	cin >> chance_col;
 	squares[chance_row-1][chance_col-1] = 2;
+
 	cout << "Where do you want to set chance card2 row: ";
 	cin >> chance_row;
 	cout << "Where do you want to set chance card2 col: ";
 	cin >> chance_col;
 	squares[chance_row-1][chance_col-1] = 2;
+}
+
+void Multi_Board::Good_chance(int row, int col, int color) {
+	cout << "Lucky!" << endl;
+	if(goods == 0){
+		good_coor[0] = row-1;
+		good_coor[1] = col-1;
+		good_coor[2] = color;
+		goods = 1;
+	}
+	else{ //goods == 1
+		good_coor[3] = row-1;
+		good_coor[4] = col-1;
+		good_coor[5] = color;
+		goods = 2;
+	}
+}
+
+void Multi_Board::Check_good() {
+	if(goods == 1){
+		squares[good_coor[0]][good_coor[1]] = good_coor[2];
+	}
+	else if(goods == 2){
+		squares[good_coor[0]][good_coor[1]] = good_coor[2];
+		squares[good_coor[3]][good_coor[4]] = good_coor[5];
+	}
+}
+
+void Multi_Board::Bad_chance(int row, int col, int color) {
+	cout << "Too bad!" << endl;
 }
 
 bool Multi_Board::has_valid_move(int val) {
@@ -585,13 +642,13 @@ bool Multi_Board::has_valid_move(int val) {
 bool Multi_Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
 	int pathr = r + rinc;
 	int pathc = c + cinc;
-	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val)
+	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val) //돌을 놓는 곳 바로 옆은 돌 색깔이 달라야 함
 		return false;
 	//check for some chip of val's along the path:
 	while (true) {
 		pathr += rinc;
 		pathc += cinc;
-		if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] == 0)
+		if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] == 0 || squares[pathr][pathc] == 2)
 			return false;
 		if (squares[pathr][pathc] == val) {
 			if (doFlips) {
@@ -614,11 +671,11 @@ bool Multi_Board::move_is_valid(int row, int col, int val) {
 	int c = col - 1;
 	if (r < 0 || r > 7 || c < 0 || c > 7)
 		return false;
-	if (squares[r][c] != 0)
+	if (squares[r][c] != 0 && squares[r][c] != 2)
 		return false;
-	for (int rinc = -1; rinc <= 1; rinc++)
+	for (int rinc = -1; rinc <= 1; rinc++) //팔방체크
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			if (check_or_flip_path(r, c, rinc, cinc, val, false))
+			if (check_or_flip_path(r, c, rinc, cinc, val, false)) //flase: check
 				return true;
 		}
 	return false;
@@ -627,10 +684,24 @@ bool Multi_Board::move_is_valid(int row, int col, int val) {
 bool Multi_Board::play_square(int row, int col, int val) {
 	if (!move_is_valid(row, col, val))
 		return false;
+	//찬스 칸에 놓는 것이 확정된 후에 좋은 찬스인지 나쁜 찬스인지 정한다.
+	if(squares[row - 1][col - 1] == 2){
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<int> dis(0, 99);
+		int random_number;
+		
+		random_number = dis(gen) % 2;
+		if(random_number)
+			Good_chance(row, col, val);
+		else
+			Bad_chance(row, col, val);
+	}
+
 	squares[row - 1][col - 1] = val;
 	for (int rinc = -1; rinc <= 1; rinc++)
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true);
+			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true); //true: flip
 		}
 	return true;
 }
@@ -638,7 +709,7 @@ bool Multi_Board::play_square(int row, int col, int val) {
 bool Multi_Board::full_board() {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
-			if (squares[i][j] == 0)
+			if (squares[i][j] == 0 || squares[i][j] == 2)
 				return false;
 	return true;
 }
@@ -662,7 +733,7 @@ void Multi_Board::set_squares(Board* b) {
 	}
 }
 
-int Multi_Board::eval(int cpuval, int depth) {
+int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 
 	int score = 0; // evaluation score
 
@@ -844,7 +915,7 @@ void play_single(int cpuval) {
 
 void play_multi(void) {
 	Multi_Board * b = new Multi_Board();
-	b->Chance_Placing();
+	b->Mode_select();
 	cout << "Black goes first." << endl;
 	b->toString();
 	int consecutivePasses = 0;
@@ -868,6 +939,7 @@ void play_multi(void) {
 				cout << "Illegal move." << endl;
 				continue;
 			}
+			b->Check_good();
 			b->toString();
 		}
 
@@ -891,6 +963,7 @@ void play_multi(void) {
 				else
 					break;
 			}
+			b->Check_good();
 			b->toString();
 		}
 	}
