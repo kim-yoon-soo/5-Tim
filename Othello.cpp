@@ -15,7 +15,7 @@ protected:
 
 public:
 	Board();
-	string toString();
+	void toString();
 	bool play_square(int, int, int);
 	bool move_is_valid(int, int, int);
 	bool check_or_flip_path(int, int, int, int, int, bool);
@@ -43,17 +43,23 @@ Board::Board() {
 	squares[4][3]=1;
 }
 
-string Board::toString() {
-	stringstream s;
-	char cforvalplusone[] = {'W', '_', 'B'};
-	s << "  1 2 3 4 5 6 7 8" << endl;
+void Board::toString() {
+	//stringstream s;
+	//char cforvalplusone[] = {'W', '_', 'B'};
+	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for(int i=0; i<8;i++) {
-		s << i+1 << '|';
+		cout << i+1 << '|';
 		for(int j=0; j<8; j++)
-			s << cforvalplusone[squares[i][j]+1] << '|';
-		s << endl;
-	}
-	return s.str();
+		{
+			if(squares[i][j] == -1)
+			cout << "○" << '|';
+			if(squares[i][j] == 0)
+			cout << "__" << '|';
+			if(squares[i][j] == 1)
+			cout << "●" << '|';
+		}
+		cout << endl;
+	}	//s.str();
 }
 
 //returns if player with val has some valid move in this configuration
@@ -511,7 +517,7 @@ class Multi_Board : public Board {
 
 public:
 	Multi_Board();
-	string toString();
+	void toString();
 	bool play_square(int, int, int);
 	bool move_is_valid(int, int, int);
 	bool check_or_flip_path(int, int, int, int, int, bool);
@@ -534,17 +540,24 @@ Multi_Board::Multi_Board() {
 	squares[4][3] = 1;
 }
 
-string Multi_Board::toString() {
-	stringstream s;
-	char cforvalplusone[] = { 'W', '_', 'B' };
-	s << "  1 2 3 4 5 6 7 8" << endl;
+void Multi_Board::toString() {
+	//stringstream s;
+	//char cforvalplusone[] = { 'W', '_', 'B' };
+	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
-		s << i + 1 << '|';
+		cout << i + 1 << '|';
+		
 		for (int j = 0; j < 8; j++)
-			s << cforvalplusone[squares[i][j] + 1] << '|';
-		s << endl;
+		{
+			if(squares[i][j] == -1)
+			cout << "○" << '|';
+			if(squares[i][j] == 0)
+			cout << "__"<< '|';
+			if(squares[i][j] == 1)
+			cout << "●" << '|';
+		}
+		cout << endl;
 	}
-	return s.str();
 }
 
 bool Multi_Board::has_valid_move(int val) {
@@ -727,7 +740,7 @@ void play_single(int cpuval) {
 	int humanPlayer = -1*cpuval;
 	int cpuPlayer = cpuval;
 
-	cout << b->toString();
+	b->toString();
 	int consecutivePasses = 0;
 
 	int row, col;
@@ -754,14 +767,14 @@ void play_single(int cpuval) {
 			if(b->full_board())
 				break;
 			else {
-				cout << b->toString() << "..." << endl;
+				b->toString(); cout << endl << "AI is thinking now, please wait" << endl;
 				//if(make_simple_cpu_move(b, cpuPlayer))
 				//	consecutivePasses=0;
 				if(make_smarter_cpu_move(b, cpuPlayer))
 					consecutivePasses=0;
 				else
 					consecutivePasses++;
-				cout << b->toString();
+				b->toString();
 			}
 		}
 	}
@@ -778,7 +791,7 @@ void play_single(int cpuval) {
 					consecutivePasses=0;
 				else
 					consecutivePasses++;
-				cout << b->toString();
+				b->toString();
 			}
 
 			//check if player must pass:
@@ -799,7 +812,7 @@ void play_single(int cpuval) {
 					else
 						break;
 				}
-				cout << b->toString();
+				b->toString();
 			}
 		}
 	}
@@ -818,7 +831,7 @@ void play_single(int cpuval) {
 void play_multi(void) {
 	Multi_Board * b = new Multi_Board();
 
-	cout << b->toString();
+	b->toString();
 	int consecutivePasses = 0;
 
 	int row, col;
@@ -840,7 +853,7 @@ void play_multi(void) {
 				cout << "Illegal move." << endl;
 				continue;
 			}
-			cout << b->toString();
+			b->toString();
 		}
 
 		//move for white:
@@ -863,7 +876,7 @@ void play_multi(void) {
 				else
 					break;
 			}
-			cout << b->toString();
+			b->toString();
 		}
 	}
 
