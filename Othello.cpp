@@ -44,8 +44,6 @@ Board::Board() {
 }
 
 void Board::toString() {
-	//stringstream s;
-	//char cforvalplusone[] = {'W', '_', 'B'};
 	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for(int i=0; i<8;i++) {
 		cout << i+1 << '|';
@@ -59,7 +57,7 @@ void Board::toString() {
 			cout << "●" << '|';
 		}
 		cout << endl;
-	}	//s.str();
+	}
 }
 
 //returns if player with val has some valid move in this configuration
@@ -541,8 +539,6 @@ Multi_Board::Multi_Board() {
 }
 
 void Multi_Board::toString() {
-	//stringstream s;
-	//char cforvalplusone[] = { 'W', '_', 'B' };
 	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
 		cout << i + 1 << '|';
