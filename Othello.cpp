@@ -14,6 +14,14 @@
 #include <conio.h>
 #include<algorithm>
 
+void gotoxy(int x, int y) {
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X = x;
+	pos.Y = y;
+	SetConsoleCursorPosition(consoleHandle, pos);
+}
+
 using namespace std;
 
 class Board {
@@ -51,8 +59,9 @@ Board::Board() {
 }
 
 void Board::toString() {
-	cout << "  1  2  3  4  5  6  7  8" << endl;
+	gotoxy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
+		gotoxy(58, 21 + i);
 		cout << i + 1 << '|';
 		for (int j = 0; j < 8; j++)
 		{
@@ -831,7 +840,7 @@ void play_single(int cpuval) {
 	Board* b = new Board();
 	int humanPlayer = -1 * cpuval;
 	int cpuPlayer = cpuval;
-
+	system("cls"); // 보드판 출력을 위해 화면 초기화
 	b->toString();
 	int consecutivePasses = 0;
 
@@ -841,17 +850,19 @@ void play_single(int cpuval) {
 		while (!b->full_board() && consecutivePasses < 2) {
 			//check if player must pass:
 			if (!b->has_valid_move(humanPlayer)) {
-				cout << "You must pass." << endl;
+				gotoxy(58, 30); cout << "You must pass." << endl;
 				consecutivePasses++;
 			}
 			else {
 				consecutivePasses = 0;
-				cout << "Your move row (1-8): ";
+				gotoxy(58, 30); cout << "Your move row (1-8): ";
 				cin >> row;
-				cout << "Your move col (1-8): ";
+				gotoxy(58, 31); cout << "Your move col (1-8): ";
 				cin >> col;
 				if (!b->play_square(row, col, humanPlayer)) {
-					cout << "Illegal move." << endl;
+					system("cls");
+					b->toString();
+					gotoxy(64, 29); cout << "Illegal move." << endl;
 					continue;
 				}
 			}
@@ -859,13 +870,16 @@ void play_single(int cpuval) {
 			if (b->full_board())
 				break;
 			else {
-				b->toString(); cout << endl << "AI is thinking now, please wait" << endl;
+				system("cls");
+				b->toString();
+				gotoxy(58, 30); cout << "AI is thinking now, please wait" << endl;
 				//if(make_simple_cpu_move(b, cpuPlayer))
 				//	consecutivePasses=0;
 				if (make_smarter_cpu_move(b, cpuPlayer))
 					consecutivePasses = 0;
 				else
 					consecutivePasses++;
+				system("cls");
 				b->toString();
 			}
 		}
@@ -876,47 +890,51 @@ void play_single(int cpuval) {
 			if (b->full_board())
 				break;
 			else {
-				cout << "..." << endl;
+				gotoxy(58, 30); cout << "..." << endl;
 				//if(make_simple_cpu_move(b, cpuPlayer))
 				//	consecutivePasses=0;
 				if (make_smarter_cpu_move(b, cpuPlayer))
 					consecutivePasses = 0;
 				else
 					consecutivePasses++;
+				system("cls");
 				b->toString();
 			}
 
 			//check if player must pass:
 			if (!b->has_valid_move(humanPlayer)) {
-				cout << "You must pass." << endl;
+				gotoxy(58, 30); cout << "You must pass." << endl;
 				consecutivePasses++;
 			}
 			else {
 				consecutivePasses = 0;
 				while (true) {
-					cout << "Your move row (1-8): ";
+					gotoxy(58, 30); cout << "Your move row (1-8): ";
 					cin >> row;
-					cout << "Your move col (1-8): ";
+					gotoxy(58, 31); cout << "Your move col (1-8): ";
 					cin >> col;
 					if (!b->play_square(row, col, humanPlayer)) {
-						cout << "Illegal move." << endl;
+						gotoxy(58, 32); cout << "Illegal move." << endl;
 					}
 					else
 						break;
 				}
+				system("cls");
 				b->toString();
 			}
 		}
 	}
 
 	int score = b->score();
-	if (score == 0)
-		cout << "Tie game." << endl;
-	else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
-		cout << "Computer wins by " << abs(score) << endl;
-	else
-		cout << "Player wins by " << abs(score) << endl;
-
+	if (score == 0) {
+		gotoxy(58, 30); cout << "Tie game." << endl;
+	}
+	else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1))) {
+		gotoxy(58, 31); cout << "Computer wins by " << abs(score) << endl;
+	}
+	else {
+		gotoxy(58, 32); cout << "Player wins by " << abs(score) << endl;
+	}
 	return;
 }
 
@@ -985,39 +1003,27 @@ void play_multi(void) {
 	return;
 }
 
-class MainMenu {
-public:
-	MainMenu() {
-		//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-		cout << "\t\t"; cout << "                                             @@                     @@  @@                 \n";
-		cout << "\t\t"; cout << "                       @@@@@@@@              @@                     @@  @@                 \n";
-		cout << "\t\t"; cout << "                      @@     @@@             @@                     @@  @@                 \n";
-		cout << "\t\t"; cout << "                     @@       @@     @       @@                     @@  @@                 \n";
-		cout << "\t\t"; cout << "                    @@@        @@    @       @@                     @@  @@                 \n";
-		cout << "\t\t"; cout << "                    @@         @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
-		cout << "\t\t"; cout << "                    @@         @@@   @       @@@    @@   @@    @@   @@  @@    @@     @@    \n";
-		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@  @@      @@  @@  @@   @@       @@   \n";
-		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@        @@ @@  @@  @@@        @@  \n";
-		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
-		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@           @@  @@  @@         @@  \n";
-		cout << "\t\t"; cout << "                     @@       @@     @       @@     @@ @@           @@  @@   @@       @@   \n";
-		cout << "\t\t"; cout << "                      @@     @@      @       @@     @@  @@          @@  @@    @@     @@    \n";
-		cout << "\t\t"; cout << "                       @@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
-		cout << "\t\t"; cout << "\n\n\n\n\n\n";
-
-		cout << "\t\t"; cout << "                                        게임을 시작하려면 아무키나 누르세요.\n\n\n\n\n\n\n";
-		cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
-	}
-};
-
-
-void gotoxy(int x, int y) {
-	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD pos;
-	pos.X = x;
-	pos.Y = y;
-	SetConsoleCursorPosition(consoleHandle, pos);
+void MainMenu() {
+	//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+	cout << "\t\t"; cout << "                                             @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                       @@@@@@@@              @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                      @@     @@@             @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                     @@       @@     @       @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                    @@@        @@    @       @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                    @@         @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
+	cout << "\t\t"; cout << "                    @@         @@@   @       @@@    @@   @@    @@   @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@  @@      @@  @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@        @@ @@  @@  @@@        @@  \n";
+	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@           @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                     @@       @@     @       @@     @@ @@           @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                      @@     @@      @       @@     @@  @@          @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                       @@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
+	cout << "\t\t"; cout << "\n\n\n\n\n\n";
+	cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
 }
+
+
 
 int Keycontrol() {
 	int key = _getch();
@@ -1110,42 +1116,46 @@ int main(int argc, char* argv[])
 			char re = 'Y';
 
 			while (re == 'Y' || re == 'y') {
-				cout << "Single play? (Y/N)" << endl;
-				cin >> a;
+				gotoxy(62, 20); cout << "Single play? (Y/N)" << endl;
+				gotoxy(62, 21); cin >> a;
 
 				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
-					cout << "Type Y or N." << endl;
-					cout << "Single play? (Y/N)" << endl;
-					cin >> a;
+					system("cls");
+					gotoxy(62, 20); cout << "Type Y or N." << endl;
+					gotoxy(62, 21); cout << "Single play? (Y/N)" << endl;
+					gotoxy(62, 22);  cin >> a;
 				}
 
 				if (a == 'Y' || a == 'y') {
-					cout << "Single play mode selected." << endl;
-					cout << "Do you want to go first?" << endl;
-					cin >> a;
+					system("cls");
+					gotoxy(62, 20); cout << "Single play mode selected." << endl;
+					gotoxy(62, 21); cout << "Do you want to go first?" << endl;
+					gotoxy(62, 22); cin >> a;
 
 					while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
-						cout << "Type Y or N." << endl;
-						cout << "Do you want to go first? (Y/N)" << endl;
-						cin >> a;
+						system("cls");
+						gotoxy(62, 20); cout << "Type Y or N." << endl;
+						gotoxy(62, 21); cout << "Do you want to go first? (Y/N)" << endl;
+						gotoxy(62, 22); cin >> a;
 					}
 
 					if (a == 'Y' || a == 'y') {
-						cout << "You are black." << endl;
+						gotoxy(62, 23); cout << "You are black." << endl;
 						play_single(-1); // our cpu's val is -1
 					}
 					else {
-						cout << "You are white." << endl;
+						gotoxy(62, 23); cout << "You are white." << endl;
 						play_single(1);
 					}
 				}
 				else {
-					cout << "Multi play mode selected." << endl;
+					system("cls");
+					gotoxy(62, 20); cout << "Multi play mode selected." << endl;
 					play_multi();
 				}
-
-				cout << "Re? (Y/N)" << endl;
-				cin >> re;
+				system("cls");
+				gotoxy(62, 20); cout << "Re? (Y/N)" << endl;
+				gotoxy(62, 21); cin >> re;
 			}
 
 			return 0;
