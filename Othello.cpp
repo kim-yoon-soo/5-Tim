@@ -1,11 +1,18 @@
 // Othello.cpp : Defines the entry point for the console application.
 // hi
 
+#define UP 1
+#define DOWN 2
+#define SELECT 3
+
 #include <iostream>
 #include <sstream>
 #include <ctime>
 #include <random>
 #include <string>
+#include <windows.h>
+#include <conio.h>
+#include<algorithm>
 
 using namespace std;
 
@@ -23,38 +30,38 @@ public:
 	int score();
 	bool full_board();
 	bool has_valid_move(int);
-	void set_squares(Board *b); //copy over another board's squares
+	void set_squares(Board* b); //copy over another board's squares
 	int eval(int, int); //heuristic evaluation of a current board for use in mimimax
 	int free_neighbors(int, int);
 };
 
 
-pair<int, int> minimax_decision(Board *b, int cpuval);
-int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
-int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
+pair<int, int> minimax_decision(Board* b, int cpuval);
+int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
+int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
 
 Board::Board() {
-	for(int i=0; i<8;i++)
-		for(int j=0; j<8; j++)
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
 			squares[i][j] = 0;
-	squares[3][3]=-1;
-	squares[4][4]=-1;
-	squares[3][4]=1;
-	squares[4][3]=1;
+	squares[3][3] = -1;
+	squares[4][4] = -1;
+	squares[3][4] = 1;
+	squares[4][3] = 1;
 }
 
 void Board::toString() {
 	cout << "  1  2  3  4  5  6  7  8" << endl;
-	for(int i=0; i<8;i++) {
-		cout << i+1 << '|';
-		for(int j=0; j<8; j++)
+	for (int i = 0; i < 8; i++) {
+		cout << i + 1 << '|';
+		for (int j = 0; j < 8; j++)
 		{
-			if(squares[i][j] == -1)
-			cout << "○" << '|';
-			if(squares[i][j] == 0)
-			cout << "__" << '|';
-			if(squares[i][j] == 1)
-			cout << "●" << '|';
+			if (squares[i][j] == -1)
+				cout << "○" << '|';
+			if (squares[i][j] == 0)
+				cout << "__" << '|';
+			if (squares[i][j] == 1)
+				cout << "●" << '|';
 		}
 		cout << endl;
 	}
@@ -62,9 +69,9 @@ void Board::toString() {
 
 //returns if player with val has some valid move in this configuration
 bool Board::has_valid_move(int val) {
-	for(int i=0; i<8;i++)
-		for(int j=0; j<8; j++)
-			if(move_is_valid(i+1, j+1, val))
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			if (move_is_valid(i + 1, j + 1, val))
 				return true;
 	return false;
 }
@@ -75,20 +82,20 @@ bool Board::has_valid_move(int val) {
 bool Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
 	int pathr = r + rinc;
 	int pathc = c + cinc;
-	if(pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc]!=-1*val)
+	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val)
 		return false;
 	//check for some chip of val's along the path:
-	while(true) {
+	while (true) {
 		pathr += rinc;
 		pathc += cinc;
-		if(pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc]==0)
+		if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] == 0)
 			return false;
-		if(squares[pathr][pathc]==val) {
-			if(doFlips) {
-				pathr=r+rinc;
-				pathc=c+cinc;
-				while(squares[pathr][pathc]!=val) {
-					squares[pathr][pathc]=val;
+		if (squares[pathr][pathc] == val) {
+			if (doFlips) {
+				pathr = r + rinc;
+				pathc = c + cinc;
+				while (squares[pathr][pathc] != val) {
+					squares[pathr][pathc] = val;
 					pathr += rinc;
 					pathc += cinc;
 				}
@@ -96,23 +103,23 @@ bool Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool d
 			return true;
 		}
 	}
-	return false;	
+	return false;
 }
 
 
 //returns whether given move is valid in this configuration
 bool Board::move_is_valid(int row, int col, int val) {
-	int r = row-1;
-	int c = col-1;
-	if(r < 0 || r > 7 || c < 0 || c > 7)
+	int r = row - 1;
+	int c = col - 1;
+	if (r < 0 || r > 7 || c < 0 || c > 7)
 		return false;
 	//check whether space is occupied:
-	if(squares[r][c]!=0)
+	if (squares[r][c] != 0)
 		return false;
 	//check that there is at least one path resulting in flips:
-	for(int rinc = -1; rinc <= 1; rinc++)
-		for(int cinc = -1; cinc <= 1; cinc++) {
-			if(check_or_flip_path(r, c, rinc, cinc, val, false))
+	for (int rinc = -1; rinc <= 1; rinc++)
+		for (int cinc = -1; cinc <= 1; cinc++) {
+			if (check_or_flip_path(r, c, rinc, cinc, val, false))
 				return true;
 		}
 	return false;
@@ -120,41 +127,41 @@ bool Board::move_is_valid(int row, int col, int val) {
 
 //executes move if it is valid.  Returns false and does not update board otherwise
 bool Board::play_square(int row, int col, int val) {
-	if(!move_is_valid(row, col, val))
+	if (!move_is_valid(row, col, val))
 		return false;
-	squares[row-1][col-1] = val;
-	for(int rinc = -1; rinc <= 1; rinc++)
-		for(int cinc = -1; cinc <= 1; cinc++) {
-			check_or_flip_path(row-1, col-1, rinc, cinc, val, true);
+	squares[row - 1][col - 1] = val;
+	for (int rinc = -1; rinc <= 1; rinc++)
+		for (int cinc = -1; cinc <= 1; cinc++) {
+			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true);
 		}
 	return true;
 }
 
 bool Board::full_board() {
-	for(int i=0; i<8;i++)
-		for(int j=0; j<8; j++)
-			if(squares[i][j]==0)
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			if (squares[i][j] == 0)
 				return false;
 	return true;
 }
 
 //returns score, positive for X player's advantage
 int Board::score() {
-	int sum =0;
-	for(int i=0; i<8;i++)
-		for(int j=0; j<8; j++)
-			sum+=squares[i][j];
+	int sum = 0;
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
+			sum += squares[i][j];
 	return sum;
 }
 
 int Board::get_square(int row, int col) {
-	return squares[row-1][col-1];
+	return squares[row - 1][col - 1];
 }
 
-void Board::set_squares(Board *b) {
+void Board::set_squares(Board* b) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			squares[i][j] = b->get_square(i+1,j+1);
+			squares[i][j] = b->get_square(i + 1, j + 1);
 		}
 	}
 }
@@ -170,17 +177,17 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 
 	// count available moves for computer and player
 	int mc = 0; int mp = 0;
-	for (int i=1; i<9;i++) {
-		for (int j=1; j<9; j++) {
+	for (int i = 1; i < 9; i++) {
+		for (int j = 1; j < 9; j++) {
 			if (move_is_valid(i, j, cpuval))
 				mc++;
-			if (move_is_valid(i, j, -1*cpuval))
+			if (move_is_valid(i, j, -1 * cpuval))
 				mp++;
 		}
 	}
 
 	// add the difference to score (scaled)
-	score += 20*(mc - mp); // the number is just some scale determined through playing
+	score += 20 * (mc - mp); // the number is just some scale determined through playing
 	//score += 7*mc;
 
 	/*
@@ -198,26 +205,26 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 	int cc = 0; int cp = 0;
 	if (get_square(1, 1) == cpuval)
 		cc++;
-	else if (get_square(1, 1) == -1*cpuval)
+	else if (get_square(1, 1) == -1 * cpuval)
 		cp++;
 
 	if (get_square(1, 8) == cpuval)
 		cc++;
-	else if (get_square(1, 8) == -1*cpuval)
+	else if (get_square(1, 8) == -1 * cpuval)
 		cp++;
 
 	if (get_square(8, 1) == cpuval)
 		cc++;
-	else if (get_square(8, 1) == -1*cpuval)
+	else if (get_square(8, 1) == -1 * cpuval)
 		cp++;
 
 	if (get_square(8, 8) == cpuval)
 		cc++;
-	else if (get_square(8, 8) == -1*cpuval)
+	else if (get_square(8, 8) == -1 * cpuval)
 		cp++;
 
 	// add the difference to score (scaled)
-	score += 200*(cc - cp);
+	score += 200 * (cc - cp);
 
 	/*
 	// squares adjacent to corners on edges also useful, but not as much since it could lead to a corner
@@ -267,20 +274,20 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 
 	// limit the amount of space around our pieces so we don't surround as much (which leads to big gains endgame for opponent)
 	int sc = 0; int sp = 0; // counts for open spaces neighboring a player/comp's pieces
-	for (int i=1; i<9;i++) {
-		for (int j=1; j<9; j++) {
+	for (int i = 1; i < 9; i++) {
+		for (int j = 1; j < 9; j++) {
 			if (get_square(i, j) == cpuval) {
 				//add count to sc
 				sc += free_neighbors(i, j);
 			}
-			if (get_square(i, j) == -1*cpuval) {
+			if (get_square(i, j) == -1 * cpuval) {
 				//add count to sp
 				sp += free_neighbors(i, j);
 			}
 		}
 	}
 
-	score -= 10*(sc - sp); // subtract because we are trying to minimize it
+	score -= 10 * (sc - sp); // subtract because we are trying to minimize it
 	return score;
 }
 
@@ -288,50 +295,50 @@ int Board::free_neighbors(int i, int j) {
 	int count = 0;
 
 	// examine the 8 possible neighborings unless not possible positions
-	if ((i+1)>0 && j>0 && (i+1)<9 && j<9 && get_square(i+1, j) == 0)
+	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && get_square(i + 1, j) == 0)
 		count++;
-	if ((i+1)>0 && (j-1)>0 && (i+1)<9 && (j-1)<9 && get_square(i+1, j-1) == 0)
+	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && get_square(i + 1, j - 1) == 0)
 		count++;
-	if (i>0 && (j-1)>0 && i<9 && (j-1)<9 && get_square(i, j-1) == 0)
+	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && get_square(i, j - 1) == 0)
 		count++;
-	if ((i-1)>0 && (j-1)>0 && (i-1)<9 && (j-1)<9 && get_square(i-1, j-1) == 0)
+	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && get_square(i - 1, j - 1) == 0)
 		count++;
-	if ((i-1)>0 && j>0 && (i-1)<9 && j<9 && get_square(i-1, j) == 0)
+	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && get_square(i - 1, j) == 0)
 		count++;
-	if ((i-1)>0 && (j+1)>0 && (i-1)<9 && (j+1)<9 && get_square(i-1, j+1) == 0)
+	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && get_square(i - 1, j + 1) == 0)
 		count++;
-	if (i>0 && (j+1)>0 && i<9 && (j+1)<9 && get_square(i, j+1) == 0)
+	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && get_square(i, j + 1) == 0)
 		count++;
-	if ((i+1)>0 && (j+1)>0 && (i+1)<9 && (j+1)<9 && get_square(i+1, j+1) == 0)
+	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && get_square(i + 1, j + 1) == 0)
 		count++;
 
 	return count;
 
 }
 
-bool make_simple_cpu_move(Board * b, int cpuval) {
-	for(int i=1; i<9;i++)
-		for(int j=1; j<9; j++)
-			if(b->get_square(i, j)==0)
-				if(b->play_square(i, j, cpuval)) 
+bool make_simple_cpu_move(Board* b, int cpuval) {
+	for (int i = 1; i < 9; i++)
+		for (int j = 1; j < 9; j++)
+			if (b->get_square(i, j) == 0)
+				if (b->play_square(i, j, cpuval))
 					return true;
 	cout << "Computer passes." << endl;
 	return false;
 }
 
-bool make_smarter_cpu_move(Board *b, int cpuval) {
-	pair<int,int> temp = minimax_decision(b, cpuval);
+bool make_smarter_cpu_move(Board* b, int cpuval) {
+	pair<int, int> temp = minimax_decision(b, cpuval);
 	if (b->get_square(temp.first, temp.second) == 0) {
 		if (b->play_square(temp.first, temp.second, cpuval))
 			return true;
 	}
-	cout << "Computer passes." <<  endl;
+	cout << "Computer passes." << endl;
 	return false;
 }
 
-pair<int, int> minimax_decision(Board *b, int cpuval) {
+pair<int, int> minimax_decision(Board* b, int cpuval) {
 	// returns a pair<int, int> <i, j> for row, column of best move
-	Board *bt = new Board();
+	Board* bt = new Board();
 	bt->set_squares(b);
 
 	int tempval;
@@ -356,7 +363,7 @@ pair<int, int> minimax_decision(Board *b, int cpuval) {
 
 		for (int i = 1; i < 9; i++) {
 			for (int j = 1; j < 9; j++) {
-				if (bt->get_square(i, j)==0) {
+				if (bt->get_square(i, j) == 0) {
 					if (bt->play_square(i, j, cpuval)) {
 
 						tempval = max_value(bt, cpuval, 9000, -9000, 1, depth, start); // start alpha at 9000, beta at -9000
@@ -381,25 +388,25 @@ pair<int, int> minimax_decision(Board *b, int cpuval) {
 		//if ( (rand() % 100) <= 3)
 		//	break;
 	}
-	
+
 	pair<int, int> ret;
 
-	
+
 	if (nomove) {
 		nomove = false;
 		maxi = 1; // just return something so comp can pass
 		maxj = 1;
-	}	
+	}
 
 	ret.first = maxi;
 	ret.second = maxj;
 
 	//printf("%d\t%d\n", depth, temp);
-	
+
 	return ret;
 }
 
-int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
+int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
 	// scoring and heuristics of current board if terminal
 	// 2 ways of being terminal: game is over (usually not the case until endgame)
 	//    or reached depth limit
@@ -409,11 +416,11 @@ int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	// if the game is over and computer wins, return maximum number possible (9000)
 	// if the game is over and player wins, -9000
 	// if tie, 0
-	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1*cpuval)))) {
+	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1 * cpuval)))) {
 		int score = b->score();
-		if(score==0)
+		if (score == 0)
 			return 0;
-		else if((score>0 && (cpuval == 1)) || (score<0 && (cpuval == -1)))
+		else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
 			return 9000;
 		else
 			return -9000;
@@ -424,20 +431,20 @@ int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	time(&now);
 	if (depth == maxdepth || difftime(now, start) >= 20)
 		return b->eval(cpuval, depth);
-		
+
 	// maximize the min value of successors
 	int minval = beta;
 	int tempval;
 
-	Board *bt = new Board();
+	Board* bt = new Board();
 	bt->set_squares(b);
 
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (b->get_square(i, j)==0) {
-				if (b->play_square(i, j, -1*cpuval)) { // since this is the player's turn, change the val
-				
-					tempval = min_value(b, cpuval, alpha, minval, depth+1, maxdepth, start); // new alpha/beta corresponding, our minval will always be >= beta
+			if (b->get_square(i, j) == 0) {
+				if (b->play_square(i, j, -1 * cpuval)) { // since this is the player's turn, change the val
+
+					tempval = min_value(b, cpuval, alpha, minval, depth + 1, maxdepth, start); // new alpha/beta corresponding, our minval will always be >= beta
 					if (tempval >= minval) { // found a new maximum min value
 						minval = tempval;
 					}
@@ -455,7 +462,7 @@ int max_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	return minval;
 }
 
-int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
+int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
 	// scoring and heuristics of current board if terminal
 
 	// 2 ways of being terminal: game is over  or no more valid moves (usually not the case until endgame)
@@ -466,11 +473,11 @@ int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	// if the game is over and computer wins, return maximum number possible (9000)
 	// if the game is over and player wins, -9000
 	// if the game is over and nobody wins, score 0
-	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1*cpuval)))) {
+	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1 * cpuval)))) {
 		int score = b->score();
-		if(score==0)
+		if (score == 0)
 			return 0;
-		else if((score>0 && (cpuval == 1)) || (score<0 && (cpuval == -1)))
+		else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
 			return 9000;
 		else
 			return -9000;
@@ -486,15 +493,15 @@ int min_value(Board *b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	int maxval = alpha;
 	int tempval;
 
-	Board *bt = new Board();
+	Board* bt = new Board();
 	bt->set_squares(b);
 
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (b->get_square(i, j)==0) {
+			if (b->get_square(i, j) == 0) {
 				if (b->play_square(i, j, cpuval)) {
 
-					tempval = max_value(b, cpuval, maxval, beta, depth+1, maxdepth, start); // our maxval always <= alpha
+					tempval = max_value(b, cpuval, maxval, beta, depth + 1, maxdepth, start); // our maxval always <= alpha
 					if (tempval <= maxval) { // found a new maximum min value
 						maxval = tempval;
 					}
@@ -555,12 +562,12 @@ void Multi_Board::Mode_select() {
 	cout << "Need chances? (Y/N)" << endl;
 	cin >> a;
 
-	if(a == "Y" || a == "y"){
+	if (a == "Y" || a == "y") {
 		mode = 1;
 		cout << "Chance mode selected." << endl;
 		Chance_Placing();
 	}
-	else{
+	else {
 		mode = 0;
 		cout << "Normal mode selected." << endl;
 	}
@@ -570,58 +577,58 @@ void Multi_Board::toString() {
 	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
 		cout << i + 1 << '|';
-		
+
 		for (int j = 0; j < 8; j++)
 		{
-			if(squares[i][j] == -1)
-			cout << "●" << '|'; //white
-			if(squares[i][j] == 0)
-			cout << "__"<< '|';
-			if(squares[i][j] == 1)
-			cout << "○" << '|'; //black
-			if(squares[i][j] == 2)
-			cout << "??" << '|';
+			if (squares[i][j] == -1)
+				cout << "●" << '|'; //white
+			if (squares[i][j] == 0)
+				cout << "__" << '|';
+			if (squares[i][j] == 1)
+				cout << "○" << '|'; //black
+			if (squares[i][j] == 2)
+				cout << "??" << '|';
 		}
 		cout << endl;
 	}
 }
 void Multi_Board::Chance_Placing() {
-	int chance_row,chance_col;
-	
+	int chance_row, chance_col;
+
 	cout << "Where do you want to set chance card1 row: ";
 	cin >> chance_row;
 	cout << "Where do you want to set chance card1 col: ";
 	cin >> chance_col;
-	squares[chance_row-1][chance_col-1] = 2;
+	squares[chance_row - 1][chance_col - 1] = 2;
 
 	cout << "Where do you want to set chance card2 row: ";
 	cin >> chance_row;
 	cout << "Where do you want to set chance card2 col: ";
 	cin >> chance_col;
-	squares[chance_row-1][chance_col-1] = 2;
+	squares[chance_row - 1][chance_col - 1] = 2;
 }
 
 void Multi_Board::Good_chance(int row, int col, int color) {
 	cout << "Lucky!" << endl;
-	if(goods == 0){
-		good_coor[0] = row-1;
-		good_coor[1] = col-1;
+	if (goods == 0) {
+		good_coor[0] = row - 1;
+		good_coor[1] = col - 1;
 		good_coor[2] = color;
 		goods = 1;
 	}
-	else{ //goods == 1
-		good_coor[3] = row-1;
-		good_coor[4] = col-1;
+	else { //goods == 1
+		good_coor[3] = row - 1;
+		good_coor[4] = col - 1;
 		good_coor[5] = color;
 		goods = 2;
 	}
 }
 
 void Multi_Board::Check_good() {
-	if(goods == 1){
+	if (goods == 1) {
 		squares[good_coor[0]][good_coor[1]] = good_coor[2];
 	}
-	else if(goods == 2){
+	else if (goods == 2) {
 		squares[good_coor[0]][good_coor[1]] = good_coor[2];
 		squares[good_coor[3]][good_coor[4]] = good_coor[5];
 	}
@@ -685,14 +692,14 @@ bool Multi_Board::play_square(int row, int col, int val) {
 	if (!move_is_valid(row, col, val))
 		return false;
 	//찬스 칸에 놓는 것이 확정된 후에 좋은 찬스인지 나쁜 찬스인지 정한다.
-	if(squares[row - 1][col - 1] == 2){
+	if (squares[row - 1][col - 1] == 2) {
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<int> dis(0, 99);
 		int random_number;
-		
+
 		random_number = dis(gen) % 2;
-		if(random_number)
+		if (random_number)
 			Good_chance(row, col, val);
 		else
 			Bad_chance(row, col, val);
@@ -749,7 +756,7 @@ int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 	}
 
 	score += 20 * (mc - mp); // the number is just some scale determined through playing
-	
+
 
 	int cc = 0; int cp = 0;
 	if (get_square(1, 1) == cpuval)
@@ -774,7 +781,7 @@ int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 
 	score += 200 * (cc - cp);
 
-	
+
 
 	// limit the amount of space around our pieces so we don't surround as much (which leads to big gains endgame for opponent)
 	int sc = 0; int sp = 0; // counts for open spaces neighboring a player/comp's pieces
@@ -821,8 +828,8 @@ int Multi_Board::free_neighbors(int i, int j) {
 }
 
 void play_single(int cpuval) {
-	Board * b = new Board();
-	int humanPlayer = -1*cpuval;
+	Board* b = new Board();
+	int humanPlayer = -1 * cpuval;
 	int cpuPlayer = cpuval;
 
 	b->toString();
@@ -831,9 +838,9 @@ void play_single(int cpuval) {
 	int row, col;
 
 	if (cpuPlayer == -1) { // cpu plays second: player = white, cpu = black
-		while(!b->full_board() && consecutivePasses<2) {
+		while (!b->full_board() && consecutivePasses < 2) {
 			//check if player must pass:
-			if(!b->has_valid_move(humanPlayer)) {
+			if (!b->has_valid_move(humanPlayer)) {
 				cout << "You must pass." << endl;
 				consecutivePasses++;
 			}
@@ -843,20 +850,20 @@ void play_single(int cpuval) {
 				cin >> row;
 				cout << "Your move col (1-8): ";
 				cin >> col;
-				if(!b->play_square(row, col, humanPlayer)) {
+				if (!b->play_square(row, col, humanPlayer)) {
 					cout << "Illegal move." << endl;
 					continue;
 				}
 			}
 			//move for computer:
-			if(b->full_board())
+			if (b->full_board())
 				break;
 			else {
 				b->toString(); cout << endl << "AI is thinking now, please wait" << endl;
 				//if(make_simple_cpu_move(b, cpuPlayer))
 				//	consecutivePasses=0;
-				if(make_smarter_cpu_move(b, cpuPlayer))
-					consecutivePasses=0;
+				if (make_smarter_cpu_move(b, cpuPlayer))
+					consecutivePasses = 0;
 				else
 					consecutivePasses++;
 				b->toString();
@@ -864,23 +871,23 @@ void play_single(int cpuval) {
 		}
 	}
 	else { // cpu plays first: player = white, cpu = black
-		while(!b->full_board() && consecutivePasses<2) {
+		while (!b->full_board() && consecutivePasses < 2) {
 			//move for computer:
-			if(b->full_board())
+			if (b->full_board())
 				break;
 			else {
 				cout << "..." << endl;
 				//if(make_simple_cpu_move(b, cpuPlayer))
 				//	consecutivePasses=0;
-				if(make_smarter_cpu_move(b, cpuPlayer))
-					consecutivePasses=0;
+				if (make_smarter_cpu_move(b, cpuPlayer))
+					consecutivePasses = 0;
 				else
 					consecutivePasses++;
 				b->toString();
 			}
 
 			//check if player must pass:
-			if(!b->has_valid_move(humanPlayer)) {
+			if (!b->has_valid_move(humanPlayer)) {
 				cout << "You must pass." << endl;
 				consecutivePasses++;
 			}
@@ -891,7 +898,7 @@ void play_single(int cpuval) {
 					cin >> row;
 					cout << "Your move col (1-8): ";
 					cin >> col;
-					if(!b->play_square(row, col, humanPlayer)) {
+					if (!b->play_square(row, col, humanPlayer)) {
 						cout << "Illegal move." << endl;
 					}
 					else
@@ -903,9 +910,9 @@ void play_single(int cpuval) {
 	}
 
 	int score = b->score();
-	if(score==0)
+	if (score == 0)
 		cout << "Tie game." << endl;
-	else if((score>0 && (cpuval == 1)) || (score<0 && (cpuval == -1)))
+	else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
 		cout << "Computer wins by " << abs(score) << endl;
 	else
 		cout << "Player wins by " << abs(score) << endl;
@@ -914,18 +921,18 @@ void play_single(int cpuval) {
 }
 
 void play_multi(void) {
-	Multi_Board * b = new Multi_Board();
+	Multi_Board* b = new Multi_Board();
 	b->Mode_select();
 	cout << "Black goes first." << endl;
 	b->toString();
 	int consecutivePasses = 0;
 
 	int row, col;
-	
-	while(!b->full_board() && consecutivePasses<2) {
+
+	while (!b->full_board() && consecutivePasses < 2) {
 		//check if player must pass:
 		cout << "Black's turn" << endl;
-		if(!b->has_valid_move(1)) {
+		if (!b->has_valid_move(1)) {
 			cout << "You must pass." << endl;
 			consecutivePasses++;
 		}
@@ -935,7 +942,7 @@ void play_multi(void) {
 			cin >> row;
 			cout << "Your move col (1-8): ";
 			cin >> col;
-			if(!b->play_square(row, col, 1)) {
+			if (!b->play_square(row, col, 1)) {
 				cout << "Illegal move." << endl;
 				continue;
 			}
@@ -945,7 +952,7 @@ void play_multi(void) {
 
 		//move for white:
 		cout << "White's turn" << endl;
-		if(!b->has_valid_move(-1)) {
+		if (!b->has_valid_move(-1)) {
 			cout << "You must pass." << endl;
 			consecutivePasses++;
 		}
@@ -956,7 +963,7 @@ void play_multi(void) {
 				cin >> row;
 				cout << "Your move col (1-8): ";
 				cin >> col;
-				if(!b->play_square(row, col, -1)) {
+				if (!b->play_square(row, col, -1)) {
 					cout << "Illegal move." << endl;
 					cout << "White's turn" << endl;
 				}
@@ -967,11 +974,10 @@ void play_multi(void) {
 			b->toString();
 		}
 	}
-
 	int score = b->score();
-	if(score==0)
+	if (score == 0)
 		cout << "Tie game." << endl;
-	else if(score > 0)
+	else if (score > 0)
 		cout << "Black wins by " << abs(score) << endl;
 	else
 		cout << "White wins by " << abs(score) << endl;
@@ -979,49 +985,178 @@ void play_multi(void) {
 	return;
 }
 
-int main(int argc, char * argv[])
-{
-	char a;
-	char re = 'Y';
+class MainMenu {
+public:
+	MainMenu() {
+		//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+		cout << "\t\t"; cout << "                                             @@                     @@  @@                 \n";
+		cout << "\t\t"; cout << "                       @@@@@@@@              @@                     @@  @@                 \n";
+		cout << "\t\t"; cout << "                      @@     @@@             @@                     @@  @@                 \n";
+		cout << "\t\t"; cout << "                     @@       @@     @       @@                     @@  @@                 \n";
+		cout << "\t\t"; cout << "                    @@@        @@    @       @@                     @@  @@                 \n";
+		cout << "\t\t"; cout << "                    @@         @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
+		cout << "\t\t"; cout << "                    @@         @@@   @       @@@    @@   @@    @@   @@  @@    @@     @@    \n";
+		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@  @@      @@  @@  @@   @@       @@   \n";
+		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@        @@ @@  @@  @@@        @@  \n";
+		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
+		cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@           @@  @@  @@         @@  \n";
+		cout << "\t\t"; cout << "                     @@       @@     @       @@     @@ @@           @@  @@   @@       @@   \n";
+		cout << "\t\t"; cout << "                      @@     @@      @       @@     @@  @@          @@  @@    @@     @@    \n";
+		cout << "\t\t"; cout << "                       @@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
+		cout << "\t\t"; cout << "\n\n\n\n\n\n";
 
-	while(re == 'Y' || re == 'y'){
-		cout << "Single play? (Y/N)" << endl;
-		cin >> a;
-	
-		while(a != 'Y' && a != 'y' && a != 'N' && a != 'n'){
-			cout << "Type Y or N." << endl;
-			cout << "Single play? (Y/N)" << endl;
-			cin >> a;
-		}
-	
-		if(a == 'Y' || a == 'y'){
-			cout << "Single play mode selected." << endl;
-			cout << "Do you want to go first?" << endl;
-			cin >> a;
-	
-			while(a != 'Y' && a != 'y' && a != 'N' && a != 'n'){
-				cout << "Type Y or N." << endl;
-				cout << "Do you want to go first? (Y/N)" << endl;
-				cin >> a;
-			}
-	
-			if (a == 'Y' || a == 'y') {
-				cout << "You are black." << endl;
-				play_single(-1); // our cpu's val is -1
-			}
-			else{
-				cout << "You are white." << endl;
-				play_single(1);
-			}
-		}
-		else{
-			cout << "Multi play mode selected." << endl;
-			play_multi();
-		}
-
-		cout << "Re? (Y/N)" << endl;
-		cin >> re;
+		cout << "\t\t"; cout << "                                        게임을 시작하려면 아무키나 누르세요.\n\n\n\n\n\n\n";
+		cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
 	}
+};
 
+
+void gotoxy(int x, int y) {
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X = x;
+	pos.Y = y;
+	SetConsoleCursorPosition(consoleHandle, pos);
+}
+
+int Keycontrol() {
+	int key = _getch();
+
+	if (key == 224 || key == 0) {
+		key = _getch();
+		switch (key) {
+		case 72:
+			return UP;
+		case 80:
+			return DOWN;
+		}
+	}
+	else if (key == 32) {
+		return SELECT;
+	}
+}
+
+int menuDraw() {
+	int x = 65;
+	int y = 40;
+	gotoxy(x - 2, y);
+	cout << "> 게 임 시 작";
+	gotoxy(x, y + 1);
+	cout << "게 임 정 보";
+	gotoxy(x, y + 2);
+	cout << "   종 료  ";
+	while (1) {
+		int n = Keycontrol();
+		switch (n) {
+		case UP: {
+			gotoxy(x - 2, y);
+			cout << " ";
+			y = y - 1;
+			if (y < 40) {
+				y = 40;
+			}
+			gotoxy(x - 2, y);
+			cout << ">";
+			break;
+		}
+		case DOWN: {
+			gotoxy(x - 2, y);
+			cout << " ";
+			y = y + 1;
+			if (y > 42) {
+				y = 42;
+			}
+			gotoxy(x - 2, y);
+			cout << ">";
+			break;
+		}
+		case SELECT: {
+			return y - 40;
+		}
+		}
+	}
+}
+
+void infoDraw() {
+	system("cls");
+	cout << "\t\t"; cout << "                                             오셀로 게임                                   \n";
+	cout << "\t\t"; cout << "                        검은 색 또는 하얀 색 작은 원판을 8x8의 판 위에 늘어 놓는 게임      \n\n\n\n";
+	cout << "\t\t"; cout << "                                                [규칙]                                     \n";
+	cout << "\t\t"; cout << "                        1. 컴퓨터와 플레이할지 다른 플레이와 플레이할지 결정합니다         \n";
+	cout << "\t\t"; cout << "                        2. 찬스카드가 포함된 게임을 할 것인지 결정합니다                   \n";
+	cout << "\t\t"; cout << "                        3. 보드판 가운데에 각자 2개의 게임말을 대각선으로 꽂고 시작합니다  \n";
+	cout << "\t\t"; cout << "                        4. 본인의 순서가 되면 자신의 게임말 1개를 보드판에 꽂습니다        \n";
+	cout << "\t\t"; cout << "                        5. 상대방의 게임말을 자신의 게임말이 양쪽(가로, 세로, 대각선 방향) \n";
+	cout << "\t\t"; cout << "                           으로 에워싸게 되면 가운데(상대편)게임말을 뒤집을 수 있습니다    \n";
+	cout << "\t\t"; cout << "                        6. 이렇게 게임판에 더 이상 올릴 게이말이 없으면 게임은 종료됩니다  \n";
+	cout << "\t\t"; cout << "                        7. 게임판의 게임말을 세어서 더 많은 플레이어가 승리합니다.         \n";
+
+	while (1) {
+		if (Keycontrol() == SELECT)
+			break;
+	}
+}
+
+int main(int argc, char* argv[])
+{
+
+	system("mode con cols=150 lines=50 | title 오셀로 게임"); // 콘솔창 크기 및 제목 설정
+	while (1) {
+		MainMenu(); // 메인 메뉴 그리기 생성자 호출
+		int menuCode = menuDraw();
+		if (menuCode == 0) {
+			system("cls");
+			char a;
+			char re = 'Y';
+
+			while (re == 'Y' || re == 'y') {
+				cout << "Single play? (Y/N)" << endl;
+				cin >> a;
+
+				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+					cout << "Type Y or N." << endl;
+					cout << "Single play? (Y/N)" << endl;
+					cin >> a;
+				}
+
+				if (a == 'Y' || a == 'y') {
+					cout << "Single play mode selected." << endl;
+					cout << "Do you want to go first?" << endl;
+					cin >> a;
+
+					while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+						cout << "Type Y or N." << endl;
+						cout << "Do you want to go first? (Y/N)" << endl;
+						cin >> a;
+					}
+
+					if (a == 'Y' || a == 'y') {
+						cout << "You are black." << endl;
+						play_single(-1); // our cpu's val is -1
+					}
+					else {
+						cout << "You are white." << endl;
+						play_single(1);
+					}
+				}
+				else {
+					cout << "Multi play mode selected." << endl;
+					play_multi();
+				}
+
+				cout << "Re? (Y/N)" << endl;
+				cin >> re;
+			}
+
+			return 0;
+		}
+		else if (menuCode == 1) {
+			infoDraw();
+		}
+		if (menuCode == 2) {
+			return 0;
+		}
+		system("cls");
+	}
 	return 0;
 }
