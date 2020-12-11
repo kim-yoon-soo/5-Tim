@@ -572,26 +572,25 @@ Multi_Board::Multi_Board() {
 
 void Multi_Board::Mode_select() {
 	string a;
-	gotoxy(62, 21); cout << "Need chances? (Y/N)" << endl;
-	gotoxy(62, 22); cin >> a;
+	cout << "Need chances? (Y/N)" << endl;
+	cin >> a;
 
 	if (a == "Y" || a == "y") {
 		mode = 1;
 		system("cls");
-		gotoxy(62, 20); cout << "Chance mode selected." << endl;
+		cout << "Chance mode selected." << endl;
 		Chance_Placing();
 	}
 	else {
 		mode = 0;
-		system("cls");
-		gotoxy(62, 20); cout << "Normal mode selected." << endl;
+		cout << "Normal mode selected." << endl;
 	}
 }
 
 void Multi_Board::toString() {
-	gotoxy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
+	cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
-		gotoxy(58, 21 + i); cout << i + 1 << '|';
+		cout << i + 1 << '|';
 
 		for (int j = 0; j < 8; j++)
 		{
@@ -610,21 +609,21 @@ void Multi_Board::toString() {
 void Multi_Board::Chance_Placing() {
 	int chance_row, chance_col;
 
-	gotoxy(58, 21); cout << "Where do you want to set chance card1 row: ";
+	cout << "Where do you want to set chance card1 row: ";
 	cin >> chance_row;
-	gotoxy(58, 22); cout << "Where do you want to set chance card1 col: ";
+	cout << "Where do you want to set chance card1 col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
 
-	gotoxy(58, 23); cout << "Where do you want to set chance card2 row: ";
+	cout << "Where do you want to set chance card2 row: ";
 	cin >> chance_row;
-	gotoxy(58, 24); cout << "Where do you want to set chance card2 col: ";
+	cout << "Where do you want to set chance card2 col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
 }
 
 void Multi_Board::Good_chance(int row, int col, int color) {
-	gotoxy(62, 29); cout << "Lucky!" << endl;
+	cout << "Lucky!" << endl;
 	if (goods == 0) {
 		good_coor[0] = row - 1;
 		good_coor[1] = col - 1;
@@ -650,7 +649,7 @@ void Multi_Board::Check_good() {
 }
 
 void Multi_Board::Bad_chance(int row, int col, int color) {
-	gotoxy(62, 29); cout << "Too bad!" << endl;
+	cout << "Too bad!" << endl;
 	if (bads == 0) {
 		bad_coor[0] = row - 1;
 		bad_coor[1] = col - 1;
@@ -944,9 +943,7 @@ void play_single(int cpuval) {
 					gotoxy(58, 31); cout << "Your move col (1-8): ";
 					cin >> col;
 					if (!b->play_square(row, col, humanPlayer)) {
-						system("cls");
-						b->toString();
-						gotoxy(62, 29); cout << "Illegal move." << endl;
+						gotoxy(58, 32); cout << "Illegal move." << endl;
 					}
 					else
 						break;
@@ -976,9 +973,8 @@ void play_single(int cpuval) {
 void play_multi(void) {
 	Multi_Board* b = new Multi_Board();
 	b->Mode_select();
-	system("cls");
+	cout << "Black goes first." << endl;
 	b->toString();
-	gotoxy(62, 18); cout << "Black goes first." << endl;
 
 	int consecutivePasses = 0;
 
@@ -986,66 +982,60 @@ void play_multi(void) {
 
 	while (!b->full_board() && consecutivePasses < 2) {
 		//check if player must pass:
-		gotoxy(62, 29); cout << "Black's turn" << endl;
+		cout << "Black's turn" << endl;
 		if (!b->has_valid_move(1)) {
-			gotoxy(58, 30); cout << "You must pass." << endl;
+			cout << "You must pass." << endl;
 			consecutivePasses++;
 		}
 		else {
 			consecutivePasses = 0;
-			gotoxy(58, 31); cout << "Your move row (1-8): ";
+			cout << "Your move row (1-8): ";
 			cin >> row;
-			gotoxy(58, 32); cout << "Your move col (1-8): ";
+			cout << "Your move col (1-8): ";
 			cin >> col;
 			if (!b->play_square(row, col, 1)) {
-				system("cls");
-				b->toString();
-				gotoxy(62, 30); cout << "Illegal move." << endl;
+				cout << "Illegal move." << endl;
 				continue;
 			}
 			b->Check_good();
 			b->Check_bad();
-			system("cls");
 			b->toString();
 		}
 
 		//move for white:
-		gotoxy(62, 29); cout << "White's turn" << endl;
+		cout << "White's turn" << endl;
 		if (!b->has_valid_move(-1)) {
-			gotoxy(58, 30); cout << "You must pass." << endl;
+			cout << "You must pass." << endl;
 			consecutivePasses++;
 		}
 		else {
 			consecutivePasses = 0;
 			while (true) {
-				gotoxy(58, 31); cout << "Your move row (1-8): ";
+				cout << "Your move row (1-8): ";
 				cin >> row;
-				gotoxy(58, 32); cout << "Your move col (1-8): ";
+				cout << "Your move col (1-8): ";
 				cin >> col;
 				if (!b->play_square(row, col, -1)) {
-					system("cls");
-					b->toString();
-					gotoxy(62, 29); cout << "White's turn" << endl;
-					gotoxy(62, 30); cout << "Illegal move." << endl;
+					cout << "White's turn" << endl;
+					cout << "Illegal move." << endl;
 				}
 				else
 					break;
 			}
 			b->Check_good();
 			b->Check_bad();
-			system("cls");
 			b->toString();
 		}
 	}
 	int score = b->score();
 	if (score == 0) {
-		gotoxy(58, 30); cout << "Tie game." << endl;
+		cout << "Tie game." << endl;
 	}
 	else if (score > 0) {
-		gotoxy(58, 31); cout << "Black wins by " << abs(score) << endl;
+		cout << "Black wins by " << abs(score) << endl;
 	}
 	else {
-		gotoxy(58, 32); cout << "White wins by " << abs(score) << endl;
+		cout << "White wins by " << abs(score) << endl;
 	}
 
 	Sleep(3000);
