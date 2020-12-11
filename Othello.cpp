@@ -66,11 +66,11 @@ void Board::toString() {
 		for (int j = 0; j < 8; j++)
 		{
 			if (squares[i][j] == -1)
-				cout << "○" << '|';
+				cout << "●" << '|'; //white
 			if (squares[i][j] == 0)
 				cout << "__" << '|';
 			if (squares[i][j] == 1)
-				cout << "●" << '|';
+				cout << "○" << '|'; //black
 		}
 		cout << endl;
 	}
@@ -532,6 +532,8 @@ private:
 	int mode; // 0: normal mode, 1: chance mode
 	int goods;
 	int good_coor[6]; //(row, col, color) * 2
+	int bads;
+	int bad_coor[6]; //(row, col, color) * 2
 
 public:
 	Multi_Board();
@@ -541,6 +543,7 @@ public:
 	void Good_chance(int, int, int);
 	void Check_good();
 	void Bad_chance(int, int, int);
+	void Check_bad();
 	bool play_square(int, int, int);
 	bool move_is_valid(int, int, int);
 	bool check_or_flip_path(int, int, int, int, int, bool);
@@ -564,6 +567,7 @@ Multi_Board::Multi_Board() {
 
 	mode = 0; //default
 	goods = 0;
+	bads = 0;
 }
 
 void Multi_Board::Mode_select() {
@@ -645,6 +649,28 @@ void Multi_Board::Check_good() {
 
 void Multi_Board::Bad_chance(int row, int col, int color) {
 	cout << "Too bad!" << endl;
+	if (bads == 0) {
+		bad_coor[0] = row - 1;
+		bad_coor[1] = col - 1;
+		bad_coor[2] = -1*color;
+		bads = 1;
+	}
+	else { //bads == 1
+		bad_coor[3] = row - 1;
+		bad_coor[4] = col - 1;
+		bad_coor[5] = -1*color;
+		bads = 2;
+	}
+}
+
+void Multi_Board::Check_bad() {
+	if (bads == 1) {
+		squares[bad_coor[0]][bad_coor[1]] = bad_coor[2];
+	}
+	else if (bads == 2) {
+		squares[bad_coor[0]][bad_coor[1]] = bad_coor[2];
+		squares[bad_coor[3]][bad_coor[4]] = bad_coor[5];
+	}
 }
 
 bool Multi_Board::has_valid_move(int val) {
@@ -704,14 +730,16 @@ bool Multi_Board::play_square(int row, int col, int val) {
 	if (squares[row - 1][col - 1] == 2) {
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_int_distribution<int> dis(0, 99);
+		std::uniform_int_distribution<int> dis(1, 99);
 		int random_number;
 
-		random_number = dis(gen) % 2;
-		if (random_number)
+		random_number = dis(gen) % 3;
+		if (random_number == 0)
 			Good_chance(row, col, val);
-		else
+		else if (random_number == 1)
 			Bad_chance(row, col, val);
+		else
+			cout << "Nothing happend!" << endl;
 	}
 
 	squares[row - 1][col - 1] = val;
@@ -935,6 +963,9 @@ void play_single(int cpuval) {
 	else {
 		gotoxy(58, 32); cout << "Player wins by " << abs(score) << endl;
 	}
+
+	Sleep(3000);
+
 	return;
 }
 
@@ -965,6 +996,7 @@ void play_multi(void) {
 				continue;
 			}
 			b->Check_good();
+			b->Check_bad();
 			b->toString();
 		}
 
@@ -989,6 +1021,7 @@ void play_multi(void) {
 					break;
 			}
 			b->Check_good();
+			b->Check_bad();
 			b->toString();
 		}
 	}
@@ -999,6 +1032,8 @@ void play_multi(void) {
 		cout << "Black wins by " << abs(score) << endl;
 	else
 		cout << "White wins by " << abs(score) << endl;
+
+	Sleep(3000);
 
 	return;
 }
@@ -1037,7 +1072,7 @@ int Keycontrol() {
 			return DOWN;
 		}
 	}
-	else if (key == 32) {
+	else if (key == 13 || key == 32) { //엔터 또는 스페이스
 		return SELECT;
 	}
 }
@@ -1156,6 +1191,7 @@ int main(int argc, char* argv[])
 				system("cls");
 				gotoxy(62, 20); cout << "Re? (Y/N)" << endl;
 				gotoxy(62, 21); cin >> re;
+				system("cls");
 			}
 
 			return 0;
