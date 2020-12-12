@@ -547,6 +547,7 @@ public:
 	void toString();
 	void Chance_Placing();
 	void Good_chance(int, int, int);
+	void Good_chance_second(int, int, int);
 	void Check_good();
 	void Bad_chance(int, int, int);
 	void Check_bad();
@@ -742,6 +743,25 @@ void Multi_Board::Good_chance(int row, int col, int color) {
 	}
 }
 
+void Multi_Board::Good_chance_second(int row, int col, int val) {
+	Multi_Board* b = new Multi_Board();
+	int change_row, change_col;
+	gotoxy(90, 21); cout << "Lucky!" << endl;
+	gotoxy(90, 22); cout << "You can change onf of the other player's color!" << endl;
+	gotoxy(90, 23); cout << "Where do you want to set chance card2 row: ";
+	cin >> change_row;
+	gotoxy(90, 24); cout << "Where do you want to set chance card1 col: ";
+	cin >> change_col;
+	if (val == -1) {	// white
+		squares[change_row-1][change_col-1] = -1;
+	}
+	else if (val == 1) {	//black
+		squares[change_row-1][change_col-1] = 1;
+	}
+	system("cls");
+	b->toString();
+}
+
 void Multi_Board::Check_good() {
 	if (goods == 1) {
 		squares[good_coor[0]][good_coor[1]] = good_coor[2];
@@ -861,11 +881,13 @@ bool Multi_Board::play_square(int row, int col, int val) {
 		std::uniform_int_distribution<int> dis(1, 99);
 		int random_number;
 
-		random_number = dis(gen) % 3;
+		random_number = dis(gen) % 4;
 		if (random_number == 0)
 			Good_chance(row, col, val);
 		else if (random_number == 1)
 			Bad_chance(row, col, val);
+		else if (random_number == 2)
+			Good_chance_second(row, col, val);
 		else
 		{
 			gotoxy(62, 30);  cout << "Nothing happend!" << endl;
