@@ -534,6 +534,12 @@ private:
 	int good_coor[6]; //(row, col, color) * 2
 	int bads;
 	int bad_coor[6]; //(row, col, color) * 2
+	int chances;
+	int chance1_row;
+	int chance1_col;
+	int chance2_row;
+	int chance2_col;
+	int check_chance[4];
 
 public:
 	Multi_Board();
@@ -568,6 +574,15 @@ Multi_Board::Multi_Board() {
 	mode = 0; //default
 	goods = 0;
 	bads = 0;
+	chances = 0;
+	chance1_row = 0;
+	chance1_col = 0;
+	chance2_row = 0;
+	chance2_col = 0;
+	check_chance[0] = 0; // chance card 1 type (1= good ,2= bad)
+	check_chance[1] = 0; // color
+	check_chance[2] = 0; // chance card 2 type (1= good ,2= bad)
+	check_chance[3] = 0; // color 
 }
 
 void Multi_Board::Mode_select() {
@@ -605,22 +620,87 @@ void Multi_Board::toString() {
 				cout << "??" << '|';
 		}
 		cout << endl;
+		string chance1_color;
+		string chance2_color;
+		
+		if (check_chance[1] == -1)
+		{
+			chance1_color = "White";
+		}
+		if (check_chance[1] == 1)
+		{
+			chance1_color = "Black";
+		}
+		if (check_chance[3] == -1)
+		{
+			chance2_color = "White";
+		}
+		if (check_chance[3] == 1)
+		{
+			chance2_color = "Black";
+		}
+		if (mode==1 && goods ==0 && bads ==0)
+		{
+			gotoxy(90, 21); cout << "chance cards are unknown yet" << endl;
+		}
+		if (mode == 1 && goods == 1 && bads == 0)
+		{
+			gotoxy(90, 21); cout << "one chance card opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
+			gotoxy(90, 23); cout << "another chance card is unknown" << endl;
+		
+		}
+		if (mode == 1 && goods == 2 && bads == 0)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
+			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is good chance, now here is always " << chance2_color << endl;
+		}
+		if (mode == 1 && goods == 0 && bads == 1)
+		{
+			gotoxy(90, 21); cout << "one chance card opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
+			gotoxy(90, 23); cout << "another chance card is unknown" << endl;
+		}
+		if (mode == 1 && goods == 0 && bads == 2)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
+			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is bad chance, now here is always " << chance2_color << endl;
+		}
+		if (mode == 1 && goods == 1 && bads == 1)
+		{
+			if (chances == 3)
+			{
+				gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+				gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
+				gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is good chance, now here is always " << chance2_color << endl;
+			}
+			else if (chances == 4)
+			{
+				gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+				gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
+				gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is bad chance, now here is always " << chance2_color << endl;
+			}
+		
+		}
 	}
 }
 void Multi_Board::Chance_Placing() {
 	int chance_row, chance_col;
 
-	gotoxy(58, 21); cout << "Where do you want to set chance card1 row: ";
+	gotoxy(58, 21); cout << "Where do you want to set first chance card row: ";
 	cin >> chance_row;
-	gotoxy(58, 22); cout << "Where do you want to set chance card1 col: ";
+	gotoxy(58, 22); cout << "Where do you want to set first chance card col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
-
-	gotoxy(58, 23); cout << "Where do you want to set chance card2 row: ";
+	chance1_row = chance_row; chance1_col = chance_col;
+	gotoxy(58, 23); cout << "Where do you want to set second chance card row: ";
 	cin >> chance_row;
-	gotoxy(58, 24); cout << "Where do you want to set chance card2 col: ";
+	gotoxy(58, 24); cout << "Where do you want to set second chance card col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
+	chance2_row = chance_row; chance2_col = chance_col;
 }
 
 void Multi_Board::Good_chance(int row, int col, int color) {
@@ -631,12 +711,34 @@ void Multi_Board::Good_chance(int row, int col, int color) {
 		good_coor[1] = col - 1;
 		good_coor[2] = color;
 		goods = 1;
+		if (chances==0)
+		{
+			chance1_row = row;
+			chance1_col = col;
+			check_chance[0] = 1;
+			check_chance[1] = color;
+			chances = 1;
+		}
+		else if (chances==1)
+		{
+			chance2_row = row;
+			chance2_col = col;
+			check_chance[2] = 1;
+			check_chance[3] = color;
+			chances = 3;
+		}
 	}
 	else { //goods == 1
 		good_coor[3] = row - 1;
 		good_coor[4] = col - 1;
 		good_coor[5] = color;
 		goods = 2;
+
+		chance2_row = row;
+		chance2_col = col;
+		check_chance[2] = 1;
+		check_chance[3] = color;
+		chances = 2;
 	}
 }
 
@@ -658,12 +760,34 @@ void Multi_Board::Bad_chance(int row, int col, int color) {
 		bad_coor[1] = col - 1;
 		bad_coor[2] = -1 * color;
 		bads = 1;
+		if (chances == 0)
+		{
+			chance1_row = row;
+			chance1_col = col;
+			check_chance[0] = 1;
+			check_chance[1] = -1 * color;
+			chances = 1;
+		}
+		else if (chances == 1)
+		{
+			chance2_row = row;
+			chance2_col = col;
+			check_chance[2] = 1;
+			check_chance[3] = -1 * color;
+			chances = 4;
+		}
 	}
 	else { //bads == 1
 		bad_coor[3] = row - 1;
 		bad_coor[4] = col - 1;
 		bad_coor[5] = -1 * color;
 		bads = 2;
+
+		chance2_row = row;
+		chance2_col = col;
+		check_chance[2] = 1;
+		check_chance[3] = -1 * color;
+		chances = 2;
 	}
 }
 
@@ -1064,19 +1188,19 @@ void play_multi(void) {
 void MainMenu() {
 	//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	cout << "\t\t"; cout << "                                     @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                       @@@@@@@@      @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                      @@     @@@     @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                     @@       @@     @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                    @@@        @@    @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                    @@         @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
-	cout << "\t\t"; cout << "                    @@         @@@   @@      @@@    @@   @@    @@   @@  @@    @@     @@    \n";
-	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@  @@      @@  @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@        @@ @@  @@  @@@        @@  \n";
-	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@           @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                     @@       @@     @@      @@     @@ @@           @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                      @@     @@      @@      @@     @@  @@          @@  @@    @@     @@    \n";
-	cout << "\t\t"; cout << "                       @@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
+	cout << "\t\t"; cout << "                      @@@@@@@@       @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                     @@      @@      @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                    @@        @@     @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                   @@@        @@@    @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                   @@          @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
+	cout << "\t\t"; cout << "                   @@          @@    @@      @@@    @@   @@    @@   @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@  @@      @@  @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@        @@ @@  @@  @@@        @@  \n";
+	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@           @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                    @@        @@     @@      @@     @@ @@           @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                     @@      @@      @@      @@     @@  @@          @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                      @@@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
 	cout << "\t\t"; cout << "\n\n\n\n\n\n";
 	cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
 }
