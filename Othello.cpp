@@ -624,7 +624,8 @@ void Multi_Board::Chance_Placing() {
 }
 
 void Multi_Board::Good_chance(int row, int col, int color) {
-	gotoxy(62, 29); cout << "Lucky!" << endl;
+	gotoxy(62, 30); cout << "Lucky!" << endl;
+	Sleep(2000);
 	if (goods == 0) {
 		good_coor[0] = row - 1;
 		good_coor[1] = col - 1;
@@ -650,7 +651,8 @@ void Multi_Board::Check_good() {
 }
 
 void Multi_Board::Bad_chance(int row, int col, int color) {
-	gotoxy(62, 29); cout << "Too bad!" << endl;
+	gotoxy(62, 30); cout << "Too bad!" << endl;
+	Sleep(2000);
 	if (bads == 0) {
 		bad_coor[0] = row - 1;
 		bad_coor[1] = col - 1;
@@ -741,7 +743,12 @@ bool Multi_Board::play_square(int row, int col, int val) {
 		else if (random_number == 1)
 			Bad_chance(row, col, val);
 		else
-			cout << "Nothing happend!" << endl;
+		{
+			gotoxy(62, 30);  cout << "Nothing happend!" << endl;
+			Sleep(2000);
+		}
+			
+		
 	}
 
 	squares[row - 1][col - 1] = val;
@@ -1003,6 +1010,7 @@ void play_multi(void) {
 				gotoxy(62, 30); cout << "Illegal move." << endl;
 				continue;
 			}
+			
 			b->Check_good();
 			b->Check_bad();
 			system("cls");
@@ -1055,19 +1063,19 @@ void play_multi(void) {
 
 void MainMenu() {
 	//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-	cout << "\t\t"; cout << "                                             @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                       @@@@@@@@              @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                      @@     @@@             @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                     @@       @@     @       @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                    @@@        @@    @       @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                                     @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                       @@@@@@@@      @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                      @@     @@@     @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                     @@       @@     @@      @@                     @@  @@                 \n";
+	cout << "\t\t"; cout << "                    @@@        @@    @@      @@                     @@  @@                 \n";
 	cout << "\t\t"; cout << "                    @@         @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
-	cout << "\t\t"; cout << "                    @@         @@@   @       @@@    @@   @@    @@   @@  @@    @@     @@    \n";
-	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@  @@      @@  @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@        @@ @@  @@  @@@        @@  \n";
-	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                    @@         @@    @       @@     @@ @@           @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                     @@       @@     @       @@     @@ @@           @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                      @@     @@      @       @@     @@  @@          @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                    @@         @@@   @@      @@@    @@   @@    @@   @@  @@    @@     @@    \n";
+	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@  @@      @@  @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@        @@ @@  @@  @@@        @@  \n";
+	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                    @@         @@    @@      @@     @@ @@           @@  @@  @@         @@  \n";
+	cout << "\t\t"; cout << "                     @@       @@     @@      @@     @@ @@           @@  @@   @@       @@   \n";
+	cout << "\t\t"; cout << "                      @@     @@      @@      @@     @@  @@          @@  @@    @@     @@    \n";
 	cout << "\t\t"; cout << "                       @@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
 	cout << "\t\t"; cout << "\n\n\n\n\n\n";
 	cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
