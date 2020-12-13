@@ -14,7 +14,7 @@
 #include <conio.h>
 #include<algorithm>
 
-void gotoxy(int x, int y) {
+void Go_to_xy(int x, int y) {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD pos;
 	pos.X = x;
@@ -30,23 +30,23 @@ protected:
 
 public:
 	Board();
-	void toString();
-	bool play_square(int, int, int);
-	bool move_is_valid(int, int, int);
-	bool check_or_flip_path(int, int, int, int, int, bool);
-	int get_square(int, int);
-	int score();
-	bool full_board();
-	bool has_valid_move(int);
-	void set_squares(Board* b); //copy over another board's squares
-	int eval(int, int); //heuristic evaluation of a current board for use in mimimax
-	int free_neighbors(int, int);
+	void To_string();
+	bool Play_square(int, int, int);
+	bool Move_is_valid(int, int, int);
+	bool Check_or_flip_path(int, int, int, int, int, bool);
+	int Get_square(int, int);
+	int Score();
+	bool Full_board();
+	bool Has_valid_move(int);
+	void Set_squares(Board* b); //copy over another board's squares
+	int Eval(int, int); //heuristic Evaluation of a current board for use in mimimax
+	int Free_neighbors(int, int);
 };
 
 
-pair<int, int> minimax_decision(Board* b, int cpuval);
-int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
-int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
+pair<int, int> Minimax_decision(Board* b, int cpuval);
+int Max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
+int Min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start);
 
 Board::Board() {
 	for (int i = 0; i < 8; i++)
@@ -58,10 +58,10 @@ Board::Board() {
 	squares[4][3] = 1;
 }
 
-void Board::toString() {
-	gotoxy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
+void Board::To_string() {
+	Go_to_xy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
-		gotoxy(58, 21 + i);
+		Go_to_xy(58, 21 + i);
 		cout << i + 1 << '|';
 		for (int j = 0; j < 8; j++)
 		{
@@ -77,10 +77,10 @@ void Board::toString() {
 }
 
 //returns if player with val has some valid move in this configuration
-bool Board::has_valid_move(int val) {
+bool Board::Has_valid_move(int val) {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
-			if (move_is_valid(i + 1, j + 1, val))
+			if (Move_is_valid(i + 1, j + 1, val))
 				return true;
 	return false;
 }
@@ -88,7 +88,7 @@ bool Board::has_valid_move(int val) {
 //r and c zero indexed here
 //checks whether path in direction rinc, cinc results in flips for val
 //will actually flip the pieces along path when doFlips is true
-bool Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
+bool Board::Check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
 	int pathr = r + rinc;
 	int pathc = c + cinc;
 	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val)
@@ -117,7 +117,7 @@ bool Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool d
 
 
 //returns whether given move is valid in this configuration
-bool Board::move_is_valid(int row, int col, int val) {
+bool Board::Move_is_valid(int row, int col, int val) {
 	int r = row - 1;
 	int c = col - 1;
 	if (r < 0 || r > 7 || c < 0 || c > 7)
@@ -128,25 +128,25 @@ bool Board::move_is_valid(int row, int col, int val) {
 	//check that there is at least one path resulting in flips:
 	for (int rinc = -1; rinc <= 1; rinc++)
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			if (check_or_flip_path(r, c, rinc, cinc, val, false))
+			if (Check_or_flip_path(r, c, rinc, cinc, val, false))
 				return true;
 		}
 	return false;
 }
 
 //executes move if it is valid.  Returns false and does not update board otherwise
-bool Board::play_square(int row, int col, int val) {
-	if (!move_is_valid(row, col, val))
+bool Board::Play_square(int row, int col, int val) {
+	if (!Move_is_valid(row, col, val))
 		return false;
 	squares[row - 1][col - 1] = val;
 	for (int rinc = -1; rinc <= 1; rinc++)
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true);
+			Check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true);
 		}
 	return true;
 }
 
-bool Board::full_board() {
+bool Board::Full_board() {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
 			if (squares[i][j] == 0)
@@ -155,7 +155,7 @@ bool Board::full_board() {
 }
 
 //returns score, positive for X player's advantage
-int Board::score() {
+int Board::Score() {
 	int sum = 0;
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
@@ -163,34 +163,34 @@ int Board::score() {
 	return sum;
 }
 
-int Board::get_square(int row, int col) {
+int Board::Get_square(int row, int col) {
 	return squares[row - 1][col - 1];
 }
 
-void Board::set_squares(Board* b) {
+void Board::Set_squares(Board* b) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			squares[i][j] = b->get_square(i + 1, j + 1);
+			squares[i][j] = b->Get_square(i + 1, j + 1);
 		}
 	}
 }
 
-int Board::eval(int cpuval, int depth) { // originally used score, but it led to bad ai
-					// instead we evaluate based maximizing the
+int Board::Eval(int cpuval, int depth) { // originally used score, but it led to bad ai
+					// instead we Evaluate based maximizing the
 					// difference between computer's available move count
 					// and the player's. Additionally, corners will be
 					// considered as specially beneficial since they cannot ever be
 					// flipped.
 
-	int score = 0; // evaluation score
+	int score = 0; // Evaluation score
 
 	// count available moves for computer and player
 	int mc = 0; int mp = 0;
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (move_is_valid(i, j, cpuval))
+			if (Move_is_valid(i, j, cpuval))
 				mc++;
-			if (move_is_valid(i, j, -1 * cpuval))
+			if (Move_is_valid(i, j, -1 * cpuval))
 				mp++;
 		}
 	}
@@ -212,24 +212,24 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 
 	// count corners for computer and player
 	int cc = 0; int cp = 0;
-	if (get_square(1, 1) == cpuval)
+	if (Get_square(1, 1) == cpuval)
 		cc++;
-	else if (get_square(1, 1) == -1 * cpuval)
+	else if (Get_square(1, 1) == -1 * cpuval)
 		cp++;
 
-	if (get_square(1, 8) == cpuval)
+	if (Get_square(1, 8) == cpuval)
 		cc++;
-	else if (get_square(1, 8) == -1 * cpuval)
+	else if (Get_square(1, 8) == -1 * cpuval)
 		cp++;
 
-	if (get_square(8, 1) == cpuval)
+	if (Get_square(8, 1) == cpuval)
 		cc++;
-	else if (get_square(8, 1) == -1 * cpuval)
+	else if (Get_square(8, 1) == -1 * cpuval)
 		cp++;
 
-	if (get_square(8, 8) == cpuval)
+	if (Get_square(8, 8) == cpuval)
 		cc++;
-	else if (get_square(8, 8) == -1 * cpuval)
+	else if (Get_square(8, 8) == -1 * cpuval)
 		cp++;
 
 	// add the difference to score (scaled)
@@ -238,40 +238,40 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 	/*
 	// squares adjacent to corners on edges also useful, but not as much since it could lead to a corner
 	int ac = 0; int ap = 0;
-	if (get_square(1, 2) == cpuval)
+	if (Get_square(1, 2) == cpuval)
 		ac++;
-	else if (get_square(1, 2) == -1*cpuval)
+	else if (Get_square(1, 2) == -1*cpuval)
 		ap++;
-	if (get_square(2, 1) == cpuval)
+	if (Get_square(2, 1) == cpuval)
 		ac++;
-	else if (get_square(2, 1) == -1*cpuval)
-		ap++;
-
-	if (get_square(1, 7) == cpuval)
-		ac++;
-	else if (get_square(1, 7) == -1*cpuval)
-		ap++;
-	if (get_square(2, 8) == cpuval)
-		ac++;
-	else if (get_square(2, 8) == -1*cpuval)
+	else if (Get_square(2, 1) == -1*cpuval)
 		ap++;
 
-	if (get_square(7, 1) == cpuval)
+	if (Get_square(1, 7) == cpuval)
 		ac++;
-	else if (get_square(7, 1) == -1*cpuval)
+	else if (Get_square(1, 7) == -1*cpuval)
 		ap++;
-	if (get_square(8, 2) == cpuval)
+	if (Get_square(2, 8) == cpuval)
 		ac++;
-	else if (get_square(8, 2) == -1*cpuval)
+	else if (Get_square(2, 8) == -1*cpuval)
 		ap++;
 
-	if (get_square(7, 8) == cpuval)
+	if (Get_square(7, 1) == cpuval)
 		ac++;
-	else if (get_square(7, 8) == -1*cpuval)
+	else if (Get_square(7, 1) == -1*cpuval)
 		ap++;
-	if (get_square(8, 7) == cpuval)
+	if (Get_square(8, 2) == cpuval)
 		ac++;
-	else if (get_square(8, 7) == -1*cpuval)
+	else if (Get_square(8, 2) == -1*cpuval)
+		ap++;
+
+	if (Get_square(7, 8) == cpuval)
+		ac++;
+	else if (Get_square(7, 8) == -1*cpuval)
+		ap++;
+	if (Get_square(8, 7) == cpuval)
+		ac++;
+	else if (Get_square(8, 7) == -1*cpuval)
 		ap++;
 
 	score += 30*(ac - ap);
@@ -285,13 +285,13 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 	int sc = 0; int sp = 0; // counts for open spaces neighboring a player/comp's pieces
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (get_square(i, j) == cpuval) {
+			if (Get_square(i, j) == cpuval) {
 				//add count to sc
-				sc += free_neighbors(i, j);
+				sc += Free_neighbors(i, j);
 			}
-			if (get_square(i, j) == -1 * cpuval) {
+			if (Get_square(i, j) == -1 * cpuval) {
 				//add count to sp
-				sp += free_neighbors(i, j);
+				sp += Free_neighbors(i, j);
 			}
 		}
 	}
@@ -300,60 +300,60 @@ int Board::eval(int cpuval, int depth) { // originally used score, but it led to
 	return score;
 }
 
-int Board::free_neighbors(int i, int j) {
+int Board::Free_neighbors(int i, int j) {
 	int count = 0;
 
 	// examine the 8 possible neighborings unless not possible positions
-	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && get_square(i + 1, j) == 0)
+	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && Get_square(i + 1, j) == 0)
 		count++;
-	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && get_square(i + 1, j - 1) == 0)
+	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && Get_square(i + 1, j - 1) == 0)
 		count++;
-	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && get_square(i, j - 1) == 0)
+	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && Get_square(i, j - 1) == 0)
 		count++;
-	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && get_square(i - 1, j - 1) == 0)
+	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && Get_square(i - 1, j - 1) == 0)
 		count++;
-	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && get_square(i - 1, j) == 0)
+	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && Get_square(i - 1, j) == 0)
 		count++;
-	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && get_square(i - 1, j + 1) == 0)
+	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && Get_square(i - 1, j + 1) == 0)
 		count++;
-	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && get_square(i, j + 1) == 0)
+	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && Get_square(i, j + 1) == 0)
 		count++;
-	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && get_square(i + 1, j + 1) == 0)
+	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && Get_square(i + 1, j + 1) == 0)
 		count++;
 
 	return count;
 
 }
 
-bool make_simple_cpu_move(Board* b, int cpuval) {
+bool Make_simple_cpu_move(Board* b, int cpuval) {
 	for (int i = 1; i < 9; i++)
 		for (int j = 1; j < 9; j++)
-			if (b->get_square(i, j) == 0)
-				if (b->play_square(i, j, cpuval))
+			if (b->Get_square(i, j) == 0)
+				if (b->Play_square(i, j, cpuval))
 					return true;
 	cout << "Computer passes." << endl;
 	return false;
 }
 
-bool make_smarter_cpu_move(Board* b, int cpuval) {
-	pair<int, int> temp = minimax_decision(b, cpuval);
-	if (b->get_square(temp.first, temp.second) == 0) {
-		if (b->play_square(temp.first, temp.second, cpuval))
+bool Make_smarter_cpu_move(Board* b, int cpuval) {
+	pair<int, int> temp = Minimax_decision(b, cpuval);
+	if (b->Get_square(temp.first, temp.second) == 0) {
+		if (b->Play_square(temp.first, temp.second, cpuval))
 			return true;
 	}
 	cout << "Computer passes." << endl;
 	return false;
 }
 
-pair<int, int> minimax_decision(Board* b, int cpuval) {
+pair<int, int> Minimax_decision(Board* b, int cpuval) {
 	// returns a pair<int, int> <i, j> for row, column of best move
 	Board* bt = new Board();
-	bt->set_squares(b);
+	bt->Set_squares(b);
 
 	int tempval;
 
-	// computer always trying to maximize eval function
-	// need a number higher than eval can ever be to treat as initial max val
+	// computer always trying to maximize Eval function
+	// need a number higher than Eval can ever be to treat as initial max val
 	int maxval = 9000;
 	int maxi;
 	int maxj;
@@ -372,10 +372,10 @@ pair<int, int> minimax_decision(Board* b, int cpuval) {
 
 		for (int i = 1; i < 9; i++) {
 			for (int j = 1; j < 9; j++) {
-				if (bt->get_square(i, j) == 0) {
-					if (bt->play_square(i, j, cpuval)) {
+				if (bt->Get_square(i, j) == 0) {
+					if (bt->Play_square(i, j, cpuval)) {
 
-						tempval = max_value(bt, cpuval, 9000, -9000, 1, depth, start); // start alpha at 9000, beta at -9000
+						tempval = Max_value(bt, cpuval, 9000, -9000, 1, depth, start); // start alpha at 9000, beta at -9000
 						if (tempval <= maxval) { // found a new minimum max value
 							nomove = false;
 							maxi = i;
@@ -383,7 +383,7 @@ pair<int, int> minimax_decision(Board* b, int cpuval) {
 							//temp = depth;
 							maxval = tempval;
 						}
-						bt->set_squares(b); // either way, erase the play and try next one
+						bt->Set_squares(b); // either way, erase the play and try next one
 					}
 				}
 			}
@@ -415,7 +415,7 @@ pair<int, int> minimax_decision(Board* b, int cpuval) {
 	return ret;
 }
 
-int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
+int Max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
 	// scoring and heuristics of current board if terminal
 	// 2 ways of being terminal: game is over (usually not the case until endgame)
 	//    or reached depth limit
@@ -425,8 +425,8 @@ int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	// if the game is over and computer wins, return maximum number possible (9000)
 	// if the game is over and player wins, -9000
 	// if tie, 0
-	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1 * cpuval)))) {
-		int score = b->score();
+	if (b->Full_board() || (!(b->Has_valid_move(cpuval)) && !(b->Has_valid_move(-1 * cpuval)))) {
+		int score = b->Score();
 		if (score == 0)
 			return 0;
 		else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
@@ -439,26 +439,26 @@ int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	time_t now;
 	time(&now);
 	if (depth == maxdepth || difftime(now, start) >= 20)
-		return b->eval(cpuval, depth);
+		return b->Eval(cpuval, depth);
 
 	// maximize the min value of successors
 	int minval = beta;
 	int tempval;
 
 	Board* bt = new Board();
-	bt->set_squares(b);
+	bt->Set_squares(b);
 
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (b->get_square(i, j) == 0) {
-				if (b->play_square(i, j, -1 * cpuval)) { // since this is the player's turn, change the val
+			if (b->Get_square(i, j) == 0) {
+				if (b->Play_square(i, j, -1 * cpuval)) { // since this is the player's turn, change the val
 
-					tempval = min_value(b, cpuval, alpha, minval, depth + 1, maxdepth, start); // new alpha/beta corresponding, our minval will always be >= beta
+					tempval = Min_value(b, cpuval, alpha, minval, depth + 1, maxdepth, start); // new alpha/beta corresponding, our minval will always be >= beta
 					if (tempval >= minval) { // found a new maximum min value
 						minval = tempval;
 					}
 
-					b->set_squares(bt); // either way, erase the play and try next one
+					b->Set_squares(bt); // either way, erase the play and try next one
 
 					// alpha-beta pruning
 					if (minval > alpha) {
@@ -471,7 +471,7 @@ int max_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	return minval;
 }
 
-int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
+int Min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth, time_t start) {
 	// scoring and heuristics of current board if terminal
 
 	// 2 ways of being terminal: game is over  or no more valid moves (usually not the case until endgame)
@@ -482,8 +482,8 @@ int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	// if the game is over and computer wins, return maximum number possible (9000)
 	// if the game is over and player wins, -9000
 	// if the game is over and nobody wins, score 0
-	if (b->full_board() || (!(b->has_valid_move(cpuval)) && !(b->has_valid_move(-1 * cpuval)))) {
-		int score = b->score();
+	if (b->Full_board() || (!(b->Has_valid_move(cpuval)) && !(b->Has_valid_move(-1 * cpuval)))) {
+		int score = b->Score();
 		if (score == 0)
 			return 0;
 		else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1)))
@@ -496,26 +496,26 @@ int min_value(Board* b, int cpuval, int alpha, int beta, int depth, int maxdepth
 	time(&now);
 	// reached depth limit, score the board according to heuristic function
 	if (depth == maxdepth || difftime(now, start) >= 20)
-		return b->eval(cpuval, depth);
+		return b->Eval(cpuval, depth);
 
 	// minimize the max value of successors
 	int maxval = alpha;
 	int tempval;
 
 	Board* bt = new Board();
-	bt->set_squares(b);
+	bt->Set_squares(b);
 
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (b->get_square(i, j) == 0) {
-				if (b->play_square(i, j, cpuval)) {
+			if (b->Get_square(i, j) == 0) {
+				if (b->Play_square(i, j, cpuval)) {
 
-					tempval = max_value(b, cpuval, maxval, beta, depth + 1, maxdepth, start); // our maxval always <= alpha
+					tempval = Max_value(b, cpuval, maxval, beta, depth + 1, maxdepth, start); // our maxval always <= alpha
 					if (tempval <= maxval) { // found a new maximum min value
 						maxval = tempval;
 					}
 
-					b->set_squares(bt); // either way, erase the play and try next one
+					b->Set_squares(bt); // either way, erase the play and try next one
 
 					if (maxval < beta) {
 						return beta;
@@ -544,23 +544,23 @@ private:
 public:
 	Multi_Board();
 	void Mode_select();
-	void toString();
+	void To_string();
 	void Chance_Placing();
 	void Good_chance(int, int, int);
 	void Good_chance_second(int, int, int);
 	void Check_good();
 	void Bad_chance(int, int, int);
 	void Check_bad();
-	bool play_square(int, int, int);
-	bool move_is_valid(int, int, int);
-	bool check_or_flip_path(int, int, int, int, int, bool);
-	int get_square(int, int);
-	int score();
-	bool full_board();
-	bool has_valid_move(int);
-	void set_squares(Board* b);
-	int eval(int, int);
-	int free_neighbors(int, int);
+	bool Play_square(int, int, int);
+	bool Move_is_valid(int, int, int);
+	bool Check_or_flip_path(int, int, int, int, int, bool);
+	int Get_square(int, int);
+	int Score();
+	bool Full_board();
+	bool Has_valid_move(int);
+	void Set_squares(Board* b);
+	int Eval(int, int);
+	int Free_neighbors(int, int);
 };
 
 Multi_Board::Multi_Board() {
@@ -588,26 +588,26 @@ Multi_Board::Multi_Board() {
 
 void Multi_Board::Mode_select() {
 	string a;
-	gotoxy(62, 21); cout << "Need chances? (Y/N)" << endl;
-	gotoxy(62, 22); cin >> a;
+	Go_to_xy(62, 21); cout << "Need chances? (Y/N)" << endl;
+	Go_to_xy(62, 22); cin >> a;
 
 	if (a == "Y" || a == "y") {
 		mode = 1;
 		system("cls");
-		gotoxy(62, 20); cout << "Chance mode selected." << endl;
+		Go_to_xy(62, 20); cout << "Chance mode selected." << endl;
 		Chance_Placing();
 	}
 	else {
 		mode = 0;
 		system("cls");
-		gotoxy(62, 20); cout << "Normal mode selected." << endl;
+		Go_to_xy(62, 20); cout << "Normal mode selected." << endl;
 	}
 }
 
-void Multi_Board::toString() {
-	gotoxy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
+void Multi_Board::To_string() {
+	Go_to_xy(58, 20); cout << "  1  2  3  4  5  6  7  8" << endl;
 	for (int i = 0; i < 8; i++) {
-		gotoxy(58, 21 + i); cout << i + 1 << '|';
+		Go_to_xy(58, 21 + i); cout << i + 1 << '|';
 
 		for (int j = 0; j < 8; j++)
 		{
@@ -642,111 +642,111 @@ void Multi_Board::toString() {
 		}
 		if (mode == 1 && chances ==0)
 		{
-			gotoxy(90, 21); cout << "chance cards are unknown yet" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are unknown yet" << endl;
 		}
 		if (mode == 1 && chances == 1)
 		{
-			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "it was nothing" << endl;
-			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
+			Go_to_xy(90, 21); cout << "one chance card opened" << endl;
+			Go_to_xy(90, 22); cout << "it was nothing" << endl;
+			Go_to_xy(90, 23); cout << "another chance card is unknown yet" << endl;
 		}
 		if (mode == 1 && chances == 3)
 		{
-			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
+			Go_to_xy(90, 21); cout << "one chance card opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card is unknown yet" << endl;
 		}
 		if (mode == 1 && chances == 9)
 		{
-			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card is unknown" << endl;
+			Go_to_xy(90, 21); cout << "one chance card opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card is unknown" << endl;
 		}
 		if (mode == 1 && chances == 27)
 		{
-			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "you changed enemies ball" << endl;
-			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
+			Go_to_xy(90, 21); cout << "one chance card opened" << endl;
+			Go_to_xy(90, 22); cout << "you changed enemies ball" << endl;
+			Go_to_xy(90, 23); cout << "another chance card is unknown yet" << endl;
 		}
 		if (mode == 1 && chances == 2)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "every chance cards were nothing" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "every chance cards were nothing" << endl;
 		}
 		if (mode == 1 && chances == 4)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card was nothing" << endl;
 		}
 		if (mode == 1 && chances == 10)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card was nothing" << endl;
 		}
 		if (mode == 1 && chances == 28)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "you changed enemies ball" << endl;
-			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "you changed enemies ball" << endl;
+			Go_to_xy(90, 23); cout << "another chance card was nothing" << endl;
 		}
 		if (mode == 1 && chances == 6)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
 		}
 		if (mode == 1 && chances == 12)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
 		}
 		if (mode == 1 && chances == 30)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
 		}
 		if (mode == 1 && chances == 18)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
 		}
 		if (mode == 1 && chances == 36)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
-			gotoxy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			Go_to_xy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
 		}
 		if (mode == 1 && chances == 54)
 		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "all chance card was changing enemies ball" << endl;
+			Go_to_xy(90, 21); cout << "chance cards are all opened" << endl;
+			Go_to_xy(90, 22); cout << "all chance card was changing enemies ball" << endl;
 		}
 	}
 }
 void Multi_Board::Chance_Placing() {
 	int chance_row, chance_col;
 
-	gotoxy(58, 21); cout << "Where do you want to set first chance card row: ";
+	Go_to_xy(58, 21); cout << "Where do you want to set first chance card row: ";
 	cin >> chance_row;
-	gotoxy(58, 22); cout << "Where do you want to set first chance card col: ";
+	Go_to_xy(58, 22); cout << "Where do you want to set first chance card col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
 	chance1_row = chance_row; chance1_col = chance_col;
-	gotoxy(58, 23); cout << "Where do you want to set second chance card row: ";
+	Go_to_xy(58, 23); cout << "Where do you want to set second chance card row: ";
 	cin >> chance_row;
-	gotoxy(58, 24); cout << "Where do you want to set second chance card col: ";
+	Go_to_xy(58, 24); cout << "Where do you want to set second chance card col: ";
 	cin >> chance_col;
 	squares[chance_row - 1][chance_col - 1] = 2;
 	chance2_row = chance_row; chance2_col = chance_col;
 }
 
 void Multi_Board::Good_chance(int row, int col, int color) {
-	gotoxy(62, 30); cout << "Lucky!" << endl;
+	Go_to_xy(62, 30); cout << "Lucky!" << endl;
 	Sleep(1500);
 	if (goods == 0) {
 		good_coor[0] = row - 1;
@@ -779,12 +779,12 @@ void Multi_Board::Good_chance(int row, int col, int color) {
 void Multi_Board::Good_chance_second(int row, int col, int val) {
 	Multi_Board* b = new Multi_Board();
 	int change_row, change_col;
-	gotoxy(90, 21); cout << "Lucky!" << endl;
+	Go_to_xy(90, 21); cout << "Lucky!" << endl;
 	Sleep(1500);
-	gotoxy(90, 22); cout << "You can change onf of the other player's color!" << endl;
-	gotoxy(90, 23); cout << "Where do you want to set chance card2 row: ";
+	Go_to_xy(90, 22); cout << "You can change the color of one of the other player's ball!" << endl;
+	Go_to_xy(90, 23); cout << "Where do you want to set chance card2 row: ";
 	cin >> change_row;
-	gotoxy(90, 24); cout << "Where do you want to set chance card1 col: ";
+	Go_to_xy(90, 24); cout << "Where do you want to set chance card1 col: ";
 	cin >> change_col;
 	if (val == -1) {	// white
 		squares[change_row - 1][change_col - 1] = -1;
@@ -794,7 +794,7 @@ void Multi_Board::Good_chance_second(int row, int col, int val) {
 	}
 	chances += 27;
 	system("cls");
-	b->toString();
+	b->To_string();
 }
 
 void Multi_Board::Check_good() {
@@ -808,7 +808,7 @@ void Multi_Board::Check_good() {
 }
 
 void Multi_Board::Bad_chance(int row, int col, int color) {
-	gotoxy(62, 30); cout << "Too bad!" << endl;
+	Go_to_xy(62, 30); cout << "Too bad!" << endl;
 	Sleep(1500);
 	if (bads == 0) {
 		bad_coor[0] = row - 1;
@@ -848,15 +848,15 @@ void Multi_Board::Check_bad() {
 	}
 }
 
-bool Multi_Board::has_valid_move(int val) {
+bool Multi_Board::Has_valid_move(int val) {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
-			if (move_is_valid(i + 1, j + 1, val))
+			if (Move_is_valid(i + 1, j + 1, val))
 				return true;
 	return false;
 }
 
-bool Multi_Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
+bool Multi_Board::Check_or_flip_path(int r, int c, int rinc, int cinc, int val, bool doFlips) {
 	int pathr = r + rinc;
 	int pathc = c + cinc;
 	if (pathr < 0 || pathr > 7 || pathc < 0 || pathc > 7 || squares[pathr][pathc] != -1 * val) //돌을 놓는 곳 바로 옆은 돌 색깔이 달라야 함
@@ -883,7 +883,7 @@ bool Multi_Board::check_or_flip_path(int r, int c, int rinc, int cinc, int val, 
 	return false;
 }
 
-bool Multi_Board::move_is_valid(int row, int col, int val) {
+bool Multi_Board::Move_is_valid(int row, int col, int val) {
 	int r = row - 1;
 	int c = col - 1;
 	if (r < 0 || r > 7 || c < 0 || c > 7)
@@ -892,14 +892,14 @@ bool Multi_Board::move_is_valid(int row, int col, int val) {
 		return false;
 	for (int rinc = -1; rinc <= 1; rinc++) //팔방체크
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			if (check_or_flip_path(r, c, rinc, cinc, val, false)) //flase: check
+			if (Check_or_flip_path(r, c, rinc, cinc, val, false)) //flase: check
 				return true;
 		}
 	return false;
 }
 
-bool Multi_Board::play_square(int row, int col, int val) {
-	if (!move_is_valid(row, col, val))
+bool Multi_Board::Play_square(int row, int col, int val) {
+	if (!Move_is_valid(row, col, val))
 		return false;
 	//찬스 칸에 놓는 것이 확정된 후에 좋은 찬스인지 나쁜 찬스인지 정한다.
 	if (squares[row - 1][col - 1] == 2) {
@@ -918,7 +918,7 @@ bool Multi_Board::play_square(int row, int col, int val) {
 		else
 		{
 			chances += 1;
-			gotoxy(62, 30);  cout << "Nothing happend!" << endl;
+			Go_to_xy(62, 30);  cout << "Nothing happend!" << endl;
 			Sleep(1500);
 		}
 
@@ -927,19 +927,19 @@ bool Multi_Board::play_square(int row, int col, int val) {
 	squares[row - 1][col - 1] = val;
 	for (int rinc = -1; rinc <= 1; rinc++)
 		for (int cinc = -1; cinc <= 1; cinc++) {
-			check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true); //true: flip
+			Check_or_flip_path(row - 1, col - 1, rinc, cinc, val, true); //true: flip
 		}
 	return true;
 }
 
-bool Multi_Board::full_board() {
+bool Multi_Board::Full_board() {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
 			if (squares[i][j] == 0 || squares[i][j] == 2)
 				return false;
 	return true;
 }
-int Multi_Board::score() {
+int Multi_Board::Score() {
 	int sum = 0;
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++)
@@ -947,29 +947,29 @@ int Multi_Board::score() {
 	return sum;
 }
 
-int Multi_Board::get_square(int row, int col) {
+int Multi_Board::Get_square(int row, int col) {
 	return squares[row - 1][col - 1];
 }
 
-void Multi_Board::set_squares(Board* b) {
+void Multi_Board::Set_squares(Board* b) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			squares[i][j] = b->get_square(i + 1, j + 1);
+			squares[i][j] = b->Get_square(i + 1, j + 1);
 		}
 	}
 }
 
-int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
+int Multi_Board::Eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 
-	int score = 0; // evaluation score
+	int score = 0; // Evaluation score
 
 	// count available moves for computer and player
 	int mc = 0; int mp = 0;
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (move_is_valid(i, j, cpuval))
+			if (Move_is_valid(i, j, cpuval))
 				mc++;
-			if (move_is_valid(i, j, -1 * cpuval))
+			if (Move_is_valid(i, j, -1 * cpuval))
 				mp++;
 		}
 	}
@@ -978,24 +978,24 @@ int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 
 
 	int cc = 0; int cp = 0;
-	if (get_square(1, 1) == cpuval)
+	if (Get_square(1, 1) == cpuval)
 		cc++;
-	else if (get_square(1, 1) == -1 * cpuval)
+	else if (Get_square(1, 1) == -1 * cpuval)
 		cp++;
 
-	if (get_square(1, 8) == cpuval)
+	if (Get_square(1, 8) == cpuval)
 		cc++;
-	else if (get_square(1, 8) == -1 * cpuval)
+	else if (Get_square(1, 8) == -1 * cpuval)
 		cp++;
 
-	if (get_square(8, 1) == cpuval)
+	if (Get_square(8, 1) == cpuval)
 		cc++;
-	else if (get_square(8, 1) == -1 * cpuval)
+	else if (Get_square(8, 1) == -1 * cpuval)
 		cp++;
 
-	if (get_square(8, 8) == cpuval)
+	if (Get_square(8, 8) == cpuval)
 		cc++;
-	else if (get_square(8, 8) == -1 * cpuval)
+	else if (Get_square(8, 8) == -1 * cpuval)
 		cp++;
 
 	score += 200 * (cc - cp);
@@ -1006,13 +1006,13 @@ int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 	int sc = 0; int sp = 0; // counts for open spaces neighboring a player/comp's pieces
 	for (int i = 1; i < 9; i++) {
 		for (int j = 1; j < 9; j++) {
-			if (get_square(i, j) == cpuval) {
+			if (Get_square(i, j) == cpuval) {
 				//add count to sc
-				sc += free_neighbors(i, j);
+				sc += Free_neighbors(i, j);
 			}
-			if (get_square(i, j) == -1 * cpuval) {
+			if (Get_square(i, j) == -1 * cpuval) {
 				//add count to sp
-				sp += free_neighbors(i, j);
+				sp += Free_neighbors(i, j);
 			}
 		}
 	}
@@ -1021,131 +1021,131 @@ int Multi_Board::eval(int cpuval, int depth) { //multi에선 필요 없을 듯
 	return score;
 }
 
-int Multi_Board::free_neighbors(int i, int j) {
+int Multi_Board::Free_neighbors(int i, int j) {
 	int count = 0;
 
 	// examine the 8 possible neighborings unless not possible positions
-	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && get_square(i + 1, j) == 0)
+	if ((i + 1) > 0 && j > 0 && (i + 1) < 9 && j < 9 && Get_square(i + 1, j) == 0)
 		count++;
-	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && get_square(i + 1, j - 1) == 0)
+	if ((i + 1) > 0 && (j - 1) > 0 && (i + 1) < 9 && (j - 1) < 9 && Get_square(i + 1, j - 1) == 0)
 		count++;
-	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && get_square(i, j - 1) == 0)
+	if (i > 0 && (j - 1) > 0 && i < 9 && (j - 1) < 9 && Get_square(i, j - 1) == 0)
 		count++;
-	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && get_square(i - 1, j - 1) == 0)
+	if ((i - 1) > 0 && (j - 1) > 0 && (i - 1) < 9 && (j - 1) < 9 && Get_square(i - 1, j - 1) == 0)
 		count++;
-	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && get_square(i - 1, j) == 0)
+	if ((i - 1) > 0 && j > 0 && (i - 1) < 9 && j < 9 && Get_square(i - 1, j) == 0)
 		count++;
-	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && get_square(i - 1, j + 1) == 0)
+	if ((i - 1) > 0 && (j + 1) > 0 && (i - 1) < 9 && (j + 1) < 9 && Get_square(i - 1, j + 1) == 0)
 		count++;
-	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && get_square(i, j + 1) == 0)
+	if (i > 0 && (j + 1) > 0 && i < 9 && (j + 1) < 9 && Get_square(i, j + 1) == 0)
 		count++;
-	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && get_square(i + 1, j + 1) == 0)
+	if ((i + 1) > 0 && (j + 1) > 0 && (i + 1) < 9 && (j + 1) < 9 && Get_square(i + 1, j + 1) == 0)
 		count++;
 
 	return count;
 
 }
 
-void play_single(int cpuval) {
+void Play_single(int cpuval) {
 	Board* b = new Board();
-	int humanPlayer = -1 * cpuval;
-	int cpuPlayer = cpuval;
+	int human_player = -1 * cpuval;
+	int cpu_player = cpuval;
 	system("cls"); // 보드판 출력을 위해 화면 초기화
-	b->toString();
-	int consecutivePasses = 0;
+	b->To_string();
+	int consecutive_passes = 0;
 
 	int row, col;
 
-	if (cpuPlayer == -1) { // cpu plays second: player = white, cpu = black
-		while (!b->full_board() && consecutivePasses < 2) {
+	if (cpu_player == -1) { // cpu plays second: player = white, cpu = black
+		while (!b->Full_board() && consecutive_passes < 2) {
 			//check if player must pass:
-			if (!b->has_valid_move(humanPlayer)) {
-				gotoxy(58, 30); cout << "You must pass." << endl;
-				consecutivePasses++;
+			if (!b->Has_valid_move(human_player)) {
+				Go_to_xy(58, 30); cout << "You must pass." << endl;
+				consecutive_passes++;
 			}
 			else {
-				consecutivePasses = 0;
-				gotoxy(58, 30); cout << "Your move row (1-8): ";
+				consecutive_passes = 0;
+				Go_to_xy(58, 30); cout << "Your move row (1-8): ";
 				cin >> row;
-				gotoxy(58, 31); cout << "Your move col (1-8): ";
+				Go_to_xy(58, 31); cout << "Your move col (1-8): ";
 				cin >> col;
-				if (!b->play_square(row, col, humanPlayer)) {
+				if (!b->Play_square(row, col, human_player)) {
 					system("cls");
-					b->toString();
-					gotoxy(64, 29); cout << "Illegal move." << endl;
+					b->To_string();
+					Go_to_xy(64, 29); cout << "Illegal move." << endl;
 					continue;
 				}
 			}
 			//move for computer:
-			if (b->full_board())
+			if (b->Full_board())
 				break;
 			else {
 				system("cls");
-				b->toString();
-				gotoxy(58, 30); cout << "AI is thinking now, please wait" << endl;
-				//if(make_simple_cpu_move(b, cpuPlayer))
-				//	consecutivePasses=0;
-				if (make_smarter_cpu_move(b, cpuPlayer))
-					consecutivePasses = 0;
+				b->To_string();
+				Go_to_xy(58, 30); cout << "AI is thinking now, please wait" << endl;
+				//if(Make_simple_cpu_move(b, cpu_player))
+				//	consecutive_passes=0;
+				if (Make_smarter_cpu_move(b, cpu_player))
+					consecutive_passes = 0;
 				else
-					consecutivePasses++;
+					consecutive_passes++;
 				system("cls");
-				b->toString();
+				b->To_string();
 			}
 		}
 	}
 	else { // cpu plays first: player = white, cpu = black
-		while (!b->full_board() && consecutivePasses < 2) {
+		while (!b->Full_board() && consecutive_passes < 2) {
 			//move for computer:
-			if (b->full_board())
+			if (b->Full_board())
 				break;
 			else {
-				gotoxy(58, 30); cout << "..." << endl;
-				//if(make_simple_cpu_move(b, cpuPlayer))
-				//	consecutivePasses=0;
-				if (make_smarter_cpu_move(b, cpuPlayer))
-					consecutivePasses = 0;
+				Go_to_xy(58, 30); cout << "..." << endl;
+				//if(Make_simple_cpu_move(b, cpu_player))
+				//	consecutive_passes=0;
+				if (Make_smarter_cpu_move(b, cpu_player))
+					consecutive_passes = 0;
 				else
-					consecutivePasses++;
+					consecutive_passes++;
 				system("cls");
-				b->toString();
+				b->To_string();
 			}
 
 			//check if player must pass:
-			if (!b->has_valid_move(humanPlayer)) {
-				gotoxy(58, 30); cout << "You must pass." << endl;
-				consecutivePasses++;
+			if (!b->Has_valid_move(human_player)) {
+				Go_to_xy(58, 30); cout << "You must pass." << endl;
+				consecutive_passes++;
 			}
 			else {
-				consecutivePasses = 0;
+				consecutive_passes = 0;
 				while (true) {
-					gotoxy(58, 30); cout << "Your move row (1-8): ";
+					Go_to_xy(58, 30); cout << "Your move row (1-8): ";
 					cin >> row;
-					gotoxy(58, 31); cout << "Your move col (1-8): ";
+					Go_to_xy(58, 31); cout << "Your move col (1-8): ";
 					cin >> col;
-					if (!b->play_square(row, col, humanPlayer)) {
+					if (!b->Play_square(row, col, human_player)) {
 						system("cls");
-						b->toString();
-						gotoxy(62, 29); cout << "Illegal move." << endl;
+						b->To_string();
+						Go_to_xy(62, 29); cout << "Illegal move." << endl;
 					}
 					else
 						break;
 				}
 				system("cls");
-				b->toString();
+				b->To_string();
 			}
 		}
 	}
 
-	int score = b->score();
+	int score = b->Score();
 	if (score == 0) {
-		gotoxy(58, 30); cout << "Tie game." << endl;
+		Go_to_xy(58, 30); cout << "Tie game." << endl;
 	}
 	else if ((score > 0 && (cpuval == 1)) || (score < 0 && (cpuval == -1))) {
-		gotoxy(58, 31); cout << "Computer wins by " << abs(score) << endl;
+		Go_to_xy(58, 31); cout << "Computer wins by " << abs(score) << endl;
 	}
 	else {
-		gotoxy(58, 32); cout << "Player wins by " << abs(score) << endl;
+		Go_to_xy(58, 32); cout << "Player wins by " << abs(score) << endl;
 	}
 
 	Sleep(3000);
@@ -1153,61 +1153,61 @@ void play_single(int cpuval) {
 	return;
 }
 
-void play_multi(void) {
+void Play_multi(void) {
 	Multi_Board* b = new Multi_Board();
 	b->Mode_select();
 	system("cls");
-	b->toString();
-	gotoxy(62, 18); cout << "Black goes first." << endl;
+	b->To_string();
+	Go_to_xy(62, 18); cout << "Black goes first." << endl;
 
-	int consecutivePasses = 0;
+	int consecutive_passes = 0;
 
 	int row, col;
 
-	while (!b->full_board() && consecutivePasses < 2) {
+	while (!b->Full_board() && consecutive_passes < 2) {
 		//check if player must pass:
-		gotoxy(62, 29); cout << "Black's turn" << endl;
-		if (!b->has_valid_move(1)) {
-			gotoxy(58, 30); cout << "You must pass." << endl;
-			consecutivePasses++;
+		Go_to_xy(62, 29); cout << "Black's turn" << endl;
+		if (!b->Has_valid_move(1)) {
+			Go_to_xy(58, 30); cout << "You must pass." << endl;
+			consecutive_passes++;
 		}
 		else {
-			consecutivePasses = 0;
-			gotoxy(58, 31); cout << "Your move row (1-8): ";
+			consecutive_passes = 0;
+			Go_to_xy(58, 31); cout << "Your move row (1-8): ";
 			cin >> row;
-			gotoxy(58, 32); cout << "Your move col (1-8): ";
+			Go_to_xy(58, 32); cout << "Your move col (1-8): ";
 			cin >> col;
-			if (!b->play_square(row, col, 1)) {
+			if (!b->Play_square(row, col, 1)) {
 				system("cls");
-				b->toString();
-				gotoxy(62, 30); cout << "Illegal move." << endl;
+				b->To_string();
+				Go_to_xy(62, 30); cout << "Illegal move." << endl;
 				continue;
 			}
 
 			b->Check_good();
 			b->Check_bad();
 			system("cls");
-			b->toString();
+			b->To_string();
 		}
 
 		//move for white:
-		gotoxy(62, 29); cout << "White's turn" << endl;
-		if (!b->has_valid_move(-1)) {
-			gotoxy(58, 30); cout << "You must pass." << endl;
-			consecutivePasses++;
+		Go_to_xy(62, 29); cout << "White's turn" << endl;
+		if (!b->Has_valid_move(-1)) {
+			Go_to_xy(58, 30); cout << "You must pass." << endl;
+			consecutive_passes++;
 		}
 		else {
-			consecutivePasses = 0;
+			consecutive_passes = 0;
 			while (true) {
-				gotoxy(58, 31); cout << "Your move row (1-8): ";
+				Go_to_xy(58, 31); cout << "Your move row (1-8): ";
 				cin >> row;
-				gotoxy(58, 32); cout << "Your move col (1-8): ";
+				Go_to_xy(58, 32); cout << "Your move col (1-8): ";
 				cin >> col;
-				if (!b->play_square(row, col, -1)) {
+				if (!b->Play_square(row, col, -1)) {
 					system("cls");
-					b->toString();
-					gotoxy(62, 29); cout << "White's turn" << endl;
-					gotoxy(62, 30); cout << "Illegal move." << endl;
+					b->To_string();
+					Go_to_xy(62, 29); cout << "White's turn" << endl;
+					Go_to_xy(62, 30); cout << "Illegal move." << endl;
 				}
 				else
 					break;
@@ -1215,18 +1215,18 @@ void play_multi(void) {
 			b->Check_good();
 			b->Check_bad();
 			system("cls");
-			b->toString();
+			b->To_string();
 		}
 	}
-	int score = b->score();
+	int score = b->Score();
 	if (score == 0) {
-		gotoxy(58, 30); cout << "Tie game." << endl;
+		Go_to_xy(58, 30); cout << "Tie game." << endl;
 	}
 	else if (score > 0) {
-		gotoxy(58, 31); cout << "Black wins by " << abs(score) << endl;
+		Go_to_xy(58, 31); cout << "Black wins by " << abs(score) << endl;
 	}
 	else {
-		gotoxy(58, 32); cout << "White wins by " << abs(score) << endl;
+		Go_to_xy(58, 32); cout << "White wins by " << abs(score) << endl;
 	}
 
 	Sleep(3000);
@@ -1234,7 +1234,7 @@ void play_multi(void) {
 	return;
 }
 
-void MainMenu() {
+void Main_menu() {
 	//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	cout << "\t\t"; cout << "                                     @@      @@                     @@  @@                 \n";
 	cout << "\t\t"; cout << "                      @@@@@@@@       @@      @@                     @@  @@                 \n";
@@ -1256,7 +1256,7 @@ void MainMenu() {
 
 
 
-int Keycontrol() {
+int Key_control() {
 	int key = _getch();
 
 	if (key == 224 || key == 0) {
@@ -1273,37 +1273,37 @@ int Keycontrol() {
 	}
 }
 
-int menuDraw() {
+int Menu_draw() {
 	int x = 65;
 	int y = 40;
-	gotoxy(x - 2, y);
+	Go_to_xy(x - 2, y);
 	cout << "> 게 임 시 작";
-	gotoxy(x, y + 1);
+	Go_to_xy(x, y + 1);
 	cout << "게 임 정 보";
-	gotoxy(x, y + 2);
+	Go_to_xy(x, y + 2);
 	cout << "   종 료  ";
 	while (1) {
-		int n = Keycontrol();
+		int n = Key_control();
 		switch (n) {
 		case UP: {
-			gotoxy(x - 2, y);
+			Go_to_xy(x - 2, y);
 			cout << " ";
 			y = y - 1;
 			if (y < 40) {
 				y = 40;
 			}
-			gotoxy(x - 2, y);
+			Go_to_xy(x - 2, y);
 			cout << ">";
 			break;
 		}
 		case DOWN: {
-			gotoxy(x - 2, y);
+			Go_to_xy(x - 2, y);
 			cout << " ";
 			y = y + 1;
 			if (y > 42) {
 				y = 42;
 			}
-			gotoxy(x - 2, y);
+			Go_to_xy(x - 2, y);
 			cout << ">";
 			break;
 		}
@@ -1314,7 +1314,7 @@ int menuDraw() {
 	}
 }
 
-void infoDraw() {
+void Info_draw() {
 	system("cls");
 	cout << "\t\t"; cout << "                                             오셀로 게임                                   \n";
 	cout << "\t\t"; cout << "                        검은 색 또는 하얀 색 작은 원판을 8x8의 판 위에 늘어 놓는 게임      \n\n\n\n";
@@ -1329,7 +1329,7 @@ void infoDraw() {
 	cout << "\t\t"; cout << "                        7. 게임판의 게임말을 세어서 더 많은 플레이어가 승리합니다.         \n";
 
 	while (1) {
-		if (Keycontrol() == SELECT)
+		if (Key_control() == SELECT)
 			break;
 	}
 }
@@ -1339,63 +1339,63 @@ int main(int argc, char* argv[])
 
 	system("mode con cols=150 lines=50 | title 오셀로 게임"); // 콘솔창 크기 및 제목 설정
 	while (1) {
-		MainMenu(); // 메인 메뉴 그리기 생성자 호출
-		int menuCode = menuDraw();
-		if (menuCode == 0) {
+		Main_menu(); // 메인 메뉴 그리기 생성자 호출
+		int menu_code = Menu_draw();
+		if (menu_code == 0) {
 			system("cls");
 			char a;
 			char re = 'Y';
 
 			while (re == 'Y' || re == 'y') {
-				gotoxy(62, 20); cout << "Single play? (Y/N)" << endl;
-				gotoxy(62, 21); cin >> a;
+				Go_to_xy(62, 20); cout << "Single play? (Y/N)" << endl;
+				Go_to_xy(62, 21); cin >> a;
 
 				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
 					system("cls");
-					gotoxy(62, 20); cout << "Type Y or N." << endl;
-					gotoxy(62, 21); cout << "Single play? (Y/N)" << endl;
-					gotoxy(62, 22);  cin >> a;
+					Go_to_xy(62, 20); cout << "Type Y or N." << endl;
+					Go_to_xy(62, 21); cout << "Single play? (Y/N)" << endl;
+					Go_to_xy(62, 22);  cin >> a;
 				}
 
 				if (a == 'Y' || a == 'y') {
 					system("cls");
-					gotoxy(62, 20); cout << "Single play mode selected." << endl;
-					gotoxy(62, 21); cout << "Do you want to go first?" << endl;
-					gotoxy(62, 22); cin >> a;
+					Go_to_xy(62, 20); cout << "Single play mode selected." << endl;
+					Go_to_xy(62, 21); cout << "Do you want to go first?" << endl;
+					Go_to_xy(62, 22); cin >> a;
 
 					while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
 						system("cls");
-						gotoxy(62, 20); cout << "Type Y or N." << endl;
-						gotoxy(62, 21); cout << "Do you want to go first? (Y/N)" << endl;
-						gotoxy(62, 22); cin >> a;
+						Go_to_xy(62, 20); cout << "Type Y or N." << endl;
+						Go_to_xy(62, 21); cout << "Do you want to go first? (Y/N)" << endl;
+						Go_to_xy(62, 22); cin >> a;
 					}
 
 					if (a == 'Y' || a == 'y') {
-						gotoxy(62, 23); cout << "You are black." << endl;
-						play_single(-1); // our cpu's val is -1
+						Go_to_xy(62, 23); cout << "You are black." << endl;
+						Play_single(-1); // our cpu's val is -1
 					}
 					else {
-						gotoxy(62, 23); cout << "You are white." << endl;
-						play_single(1);
+						Go_to_xy(62, 23); cout << "You are white." << endl;
+						Play_single(1);
 					}
 				}
 				else {
 					system("cls");
-					gotoxy(62, 20); cout << "Multi play mode selected." << endl;
-					play_multi();
+					Go_to_xy(62, 20); cout << "Multi play mode selected." << endl;
+					Play_multi();
 				}
 				system("cls");
-				gotoxy(62, 20); cout << "Re? (Y/N)" << endl;
-				gotoxy(62, 21); cin >> re;
+				Go_to_xy(62, 20); cout << "Re? (Y/N)" << endl;
+				Go_to_xy(62, 21); cin >> re;
 				system("cls");
 			}
 
 			return 0;
 		}
-		else if (menuCode == 1) {
-			infoDraw();
+		else if (menu_code == 1) {
+			Info_draw();
 		}
-		if (menuCode == 2) {
+		if (menu_code == 2) {
 			return 0;
 		}
 		system("cls");
