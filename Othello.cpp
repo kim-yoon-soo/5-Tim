@@ -623,7 +623,7 @@ void Multi_Board::toString() {
 		cout << endl;
 		string chance1_color;
 		string chance2_color;
-		
+
 		if (check_chance[1] == -1)
 		{
 			chance1_color = "White";
@@ -640,50 +640,91 @@ void Multi_Board::toString() {
 		{
 			chance2_color = "Black";
 		}
-		if (mode==1 && goods ==0 && bads ==0)
+		if (mode == 1 && chances ==0)
 		{
 			gotoxy(90, 21); cout << "chance cards are unknown yet" << endl;
 		}
-		if (mode == 1 && goods == 1 && bads == 0)
+		if (mode == 1 && chances == 1)
 		{
 			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
-			gotoxy(90, 23); cout << "another chance card is unknown" << endl;
-		
+			gotoxy(90, 22); cout << "it was nothing" << endl;
+			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
 		}
-		if (mode == 1 && goods == 2 && bads == 0)
-		{
-			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
-			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is good chance, now here is always " << chance2_color << endl;
-		}
-		if (mode == 1 && goods == 0 && bads == 1)
+		if (mode == 1 && chances == 3)
 		{
 			gotoxy(90, 21); cout << "one chance card opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
+		}
+		if (mode == 1 && chances == 9)
+		{
+			gotoxy(90, 21); cout << "one chance card opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
 			gotoxy(90, 23); cout << "another chance card is unknown" << endl;
 		}
-		if (mode == 1 && goods == 0 && bads == 2)
+		if (mode == 1 && chances == 27)
+		{
+			gotoxy(90, 21); cout << "one chance card opened" << endl;
+			gotoxy(90, 22); cout << "you changed enemies ball" << endl;
+			gotoxy(90, 23); cout << "another chance card is unknown yet" << endl;
+		}
+		if (mode == 1 && chances == 2)
 		{
 			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
-			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is bad chance, now here is always " << chance2_color << endl;
+			gotoxy(90, 22); cout << "every chance cards were nothing" << endl;
 		}
-		if (mode == 1 && goods == 1 && bads == 1)
+		if (mode == 1 && chances == 4)
 		{
-			if (chances == 3)
-			{
-				gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-				gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is bad chance, now here is always " << chance1_color << endl;
-				gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is good chance, now here is always " << chance2_color << endl;
-			}
-			else if (chances == 4)
-			{
-				gotoxy(90, 21); cout << "chance cards are all opened" << endl;
-				gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is good chance, now here is always " << chance1_color << endl;
-				gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is bad chance, now here is always " << chance2_color << endl;
-			}
-		
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+		}
+		if (mode == 1 && chances == 10)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+		}
+		if (mode == 1 && chances == 28)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "you changed enemies ball" << endl;
+			gotoxy(90, 23); cout << "another chance card was nothing" << endl;
+		}
+		if (mode == 1 && chances == 6)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+		}
+		if (mode == 1 && chances == 12)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+		}
+		if (mode == 1 && chances == 30)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
+		}
+		if (mode == 1 && chances == 18)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "chance card[" << chance2_row << "][" << chance2_col << "]is always " << chance2_color << " from now!!" << endl;
+		}
+		if (mode == 1 && chances == 36)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "chance card[" << chance1_row << "][" << chance1_col << "]is always " << chance1_color << " from now!!" << endl;
+			gotoxy(90, 23); cout << "another chance card, you changed enemies ball" << endl;
+		}
+		if (mode == 1 && chances == 54)
+		{
+			gotoxy(90, 21); cout << "chance cards are all opened" << endl;
+			gotoxy(90, 22); cout << "all chance card was changing enemies ball" << endl;
 		}
 	}
 }
@@ -706,27 +747,19 @@ void Multi_Board::Chance_Placing() {
 
 void Multi_Board::Good_chance(int row, int col, int color) {
 	gotoxy(62, 30); cout << "Lucky!" << endl;
-	Sleep(2000);
+	Sleep(1500);
 	if (goods == 0) {
 		good_coor[0] = row - 1;
 		good_coor[1] = col - 1;
 		good_coor[2] = color;
 		goods = 1;
-		if (chances==0)
+		if (chances == 0 || chances == 1 || chances == 9 || chances == 27)
 		{
 			chance1_row = row;
 			chance1_col = col;
 			check_chance[0] = 1;
 			check_chance[1] = color;
-			chances = 1;
-		}
-		else if (chances==1)
-		{
-			chance2_row = row;
-			chance2_col = col;
-			check_chance[2] = 1;
-			check_chance[3] = color;
-			chances = 3;
+			chances += 3;
 		}
 	}
 	else { //goods == 1
@@ -739,7 +772,7 @@ void Multi_Board::Good_chance(int row, int col, int color) {
 		chance2_col = col;
 		check_chance[2] = 1;
 		check_chance[3] = color;
-		chances = 2;
+		chances += 3;
 	}
 }
 
@@ -747,17 +780,19 @@ void Multi_Board::Good_chance_second(int row, int col, int val) {
 	Multi_Board* b = new Multi_Board();
 	int change_row, change_col;
 	gotoxy(90, 21); cout << "Lucky!" << endl;
+	Sleep(1500);
 	gotoxy(90, 22); cout << "You can change onf of the other player's color!" << endl;
 	gotoxy(90, 23); cout << "Where do you want to set chance card2 row: ";
 	cin >> change_row;
 	gotoxy(90, 24); cout << "Where do you want to set chance card1 col: ";
 	cin >> change_col;
 	if (val == -1) {	// white
-		squares[change_row-1][change_col-1] = -1;
+		squares[change_row - 1][change_col - 1] = -1;
 	}
 	else if (val == 1) {	//black
-		squares[change_row-1][change_col-1] = 1;
+		squares[change_row - 1][change_col - 1] = 1;
 	}
+	chances += 27;
 	system("cls");
 	b->toString();
 }
@@ -774,27 +809,19 @@ void Multi_Board::Check_good() {
 
 void Multi_Board::Bad_chance(int row, int col, int color) {
 	gotoxy(62, 30); cout << "Too bad!" << endl;
-	Sleep(2000);
+	Sleep(1500);
 	if (bads == 0) {
 		bad_coor[0] = row - 1;
 		bad_coor[1] = col - 1;
 		bad_coor[2] = -1 * color;
 		bads = 1;
-		if (chances == 0)
+		if (chances == 0 || chances ==1 || chances == 3 || chances == 27)
 		{
 			chance1_row = row;
 			chance1_col = col;
 			check_chance[0] = 1;
 			check_chance[1] = -1 * color;
-			chances = 1;
-		}
-		else if (chances == 1)
-		{
-			chance2_row = row;
-			chance2_col = col;
-			check_chance[2] = 1;
-			check_chance[3] = -1 * color;
-			chances = 4;
+			chances += 9;
 		}
 	}
 	else { //bads == 1
@@ -807,7 +834,7 @@ void Multi_Board::Bad_chance(int row, int col, int color) {
 		chance2_col = col;
 		check_chance[2] = 1;
 		check_chance[3] = -1 * color;
-		chances = 2;
+		chances += 9;
 	}
 }
 
@@ -890,11 +917,11 @@ bool Multi_Board::play_square(int row, int col, int val) {
 			Good_chance_second(row, col, val);
 		else
 		{
+			chances += 1;
 			gotoxy(62, 30);  cout << "Nothing happend!" << endl;
-			Sleep(2000);
+			Sleep(1500);
 		}
-			
-		
+
 	}
 
 	squares[row - 1][col - 1] = val;
@@ -1156,7 +1183,7 @@ void play_multi(void) {
 				gotoxy(62, 30); cout << "Illegal move." << endl;
 				continue;
 			}
-			
+
 			b->Check_good();
 			b->Check_bad();
 			system("cls");
