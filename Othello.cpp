@@ -640,7 +640,7 @@ void Multi_Board::To_string() {
 		{
 			chance2_color = "Black";
 		}
-		if (mode == 1 && chances ==0)
+		if (mode == 1 && chances == 0)
 		{
 			Go_to_xy(90, 21); cout << "chance cards are unknown yet" << endl;
 		}
@@ -779,12 +779,12 @@ void Multi_Board::Good_chance(int row, int col, int color) {
 void Multi_Board::Good_chance_second(int row, int col, int val) {
 	Multi_Board* b = new Multi_Board();
 	int change_row, change_col;
-	Go_to_xy(90, 21); cout << "Lucky!" << endl;
+	Go_to_xy(62, 30); cout << "Lucky!" << endl;
 	Sleep(1500);
-	Go_to_xy(90, 22); cout << "You can change the color of one of the other player's ball!" << endl;
-	Go_to_xy(90, 23); cout << "Where do you want to set chance card2 row: ";
+	Go_to_xy(90, 25); cout << "You can change the color of one of the other player's ball!" << endl;
+	Go_to_xy(90, 26); cout << "Where do you want to set chance card2 row: ";
 	cin >> change_row;
-	Go_to_xy(90, 24); cout << "Where do you want to set chance card1 col: ";
+	Go_to_xy(90, 27); cout << "Where do you want to set chance card1 col: ";
 	cin >> change_col;
 	if (val == -1) {	// white
 		squares[change_row - 1][change_col - 1] = -1;
@@ -815,7 +815,7 @@ void Multi_Board::Bad_chance(int row, int col, int color) {
 		bad_coor[1] = col - 1;
 		bad_coor[2] = -1 * color;
 		bads = 1;
-		if (chances == 0 || chances ==1 || chances == 3 || chances == 27)
+		if (chances == 0 || chances == 1 || chances == 3 || chances == 27)
 		{
 			chance1_row = row;
 			chance1_col = col;
@@ -1236,22 +1236,25 @@ void Play_multi(void) {
 
 void Main_menu() {
 	//cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-	cout << "\t\t"; cout << "                                     @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                      @@@@@@@@       @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                     @@      @@      @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                    @@        @@     @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                   @@@        @@@    @@      @@                     @@  @@                 \n";
-	cout << "\t\t"; cout << "                   @@          @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@      \n";
-	cout << "\t\t"; cout << "                   @@          @@    @@      @@@    @@   @@    @@   @@  @@    @@     @@    \n";
-	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@  @@      @@  @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@        @@ @@  @@  @@@        @@  \n";
-	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                   @@          @@    @@      @@     @@ @@           @@  @@  @@         @@  \n";
-	cout << "\t\t"; cout << "                    @@        @@     @@      @@     @@ @@           @@  @@   @@       @@   \n";
-	cout << "\t\t"; cout << "                     @@      @@      @@      @@     @@  @@          @@  @@    @@     @@    \n";
-	cout << "\t\t"; cout << "                      @@@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@      \n";
+	cout << "\t\t"; cout << "                                                                                                   \n";
+	cout << "\t\t"; cout << "            ●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○   \n";
+	cout << "\t\t"; cout << "            ○         @@@@@@@@       @@      @@                     @@  @@                   ●   \n";
+	cout << "\t\t"; cout << "            ●        @@      @@      @@      @@                     @@  @@                   ○   \n";
+	cout << "\t\t"; cout << "            ○       @@        @@     @@      @@                     @@  @@                   ●   \n";
+	cout << "\t\t"; cout << "            ●      @@          @@    @@      @@                     @@  @@                   ○   \n";
+	cout << "\t\t"; cout << "            ○      @@          @@    @@      @@                     @@  @@                   ●   \n";
+	cout << "\t\t"; cout << "            ●      @@          @@  @@@@@@@   @@@@@@@@      @@@@     @@  @@      @@@@@        ○   \n";
+	cout << "\t\t"; cout << "            ○      @@          @@    @@      @@@    @@   @@    @@   @@  @@    @@     @@      ●   \n";
+	cout << "\t\t"; cout << "            ●      @@          @@    @@      @@     @@  @@      @@  @@  @@   @@       @@     ○   \n";
+	cout << "\t\t"; cout << "            ○      @@          @@    @@      @@     @@ @@        @@ @@  @@  @@@        @@    ●   \n";
+	cout << "\t\t"; cout << "            ●      @@          @@    @@      @@     @@ @@@@@@@@@@@@ @@  @@  @@         @@    ○   \n";
+	cout << "\t\t"; cout << "            ○      @@          @@    @@      @@     @@ @@           @@  @@  @@         @@    ●   \n";
+	cout << "\t\t"; cout << "            ●       @@        @@     @@      @@     @@ @@           @@  @@   @@       @@     ○   \n";
+	cout << "\t\t"; cout << "            ○        @@      @@      @@      @@     @@  @@          @@  @@    @@     @@      ●   \n";
+	cout << "\t\t"; cout << "            ●         @@@@@@@@       @@@@@@@ @@     @@    @@@@@@@@@ @@  @@      @@@@@        ○   \n";
+	cout << "\t\t"; cout << "            ○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●○●   \n";
 	cout << "\t\t"; cout << "\n\n\n\n\n\n";
-	cout << "\t\t"; cout << "                                                                       OthelloGame By SW3 5-TIM";
+	cout << "\t\t"; cout << "                                                                        OthelloGame By SW3 5-TIM";
 }
 
 
@@ -1402,3 +1405,4 @@ int main(int argc, char* argv[])
 	}
 	return 0;
 }
+
