@@ -1337,6 +1337,58 @@ void Info_draw() {
 	}
 }
 
+void Playgame() {
+	system("cls");
+	char a;
+	char re = 'Y';
+
+	while (re == 'Y' || re == 'y') {
+		Go_to_xy(62, 20); cout << "Single play? (Y/N)" << endl;
+		Go_to_xy(62, 21); cin >> a;
+
+		while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+			system("cls");
+			Go_to_xy(62, 20); cout << "Type Y or N." << endl;
+			Go_to_xy(62, 21); cout << "Single play? (Y/N)" << endl;
+			Go_to_xy(62, 22);  cin >> a;
+		}
+
+		if (a == 'Y' || a == 'y') {
+			system("cls");
+			Go_to_xy(62, 20); cout << "Single play mode selected." << endl;
+			Go_to_xy(62, 21); cout << "Do you want to go first?" << endl;
+			Go_to_xy(62, 22); cin >> a;
+
+			while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				system("cls");
+				Go_to_xy(62, 20); cout << "Type Y or N." << endl;
+				Go_to_xy(62, 21); cout << "Do you want to go first? (Y/N)" << endl;
+				Go_to_xy(62, 22); cin >> a;
+			}
+
+			if (a == 'Y' || a == 'y') {
+				Go_to_xy(62, 23); cout << "You are black." << endl;
+				Play_single(-1); // our cpu's val is -1
+			}
+			else {
+				Go_to_xy(62, 23); cout << "You are white." << endl;
+				Play_single(1);
+			}
+		}
+		else {
+			system("cls");
+			Go_to_xy(62, 20); cout << "Multi play mode selected." << endl;
+			Play_multi();
+		}
+		system("cls");
+		Go_to_xy(62, 20); cout << "Re? (Y/N)" << endl;
+		Go_to_xy(62, 21); cin >> re;
+		system("cls");
+	}
+
+
+}
+
 int main(int argc, char* argv[])
 {
 
@@ -1345,54 +1397,7 @@ int main(int argc, char* argv[])
 		Main_menu(); // 메인 메뉴 그리기 생성자 호출
 		int menu_code = Menu_draw();
 		if (menu_code == 0) {
-			system("cls");
-			char a;
-			char re = 'Y';
-
-			while (re == 'Y' || re == 'y') {
-				Go_to_xy(62, 20); cout << "Single play? (Y/N)" << endl;
-				Go_to_xy(62, 21); cin >> a;
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
-					system("cls");
-					Go_to_xy(62, 20); cout << "Type Y or N." << endl;
-					Go_to_xy(62, 21); cout << "Single play? (Y/N)" << endl;
-					Go_to_xy(62, 22);  cin >> a;
-				}
-
-				if (a == 'Y' || a == 'y') {
-					system("cls");
-					Go_to_xy(62, 20); cout << "Single play mode selected." << endl;
-					Go_to_xy(62, 21); cout << "Do you want to go first?" << endl;
-					Go_to_xy(62, 22); cin >> a;
-
-					while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
-						system("cls");
-						Go_to_xy(62, 20); cout << "Type Y or N." << endl;
-						Go_to_xy(62, 21); cout << "Do you want to go first? (Y/N)" << endl;
-						Go_to_xy(62, 22); cin >> a;
-					}
-
-					if (a == 'Y' || a == 'y') {
-						Go_to_xy(62, 23); cout << "You are black." << endl;
-						Play_single(-1); // our cpu's val is -1
-					}
-					else {
-						Go_to_xy(62, 23); cout << "You are white." << endl;
-						Play_single(1);
-					}
-				}
-				else {
-					system("cls");
-					Go_to_xy(62, 20); cout << "Multi play mode selected." << endl;
-					Play_multi();
-				}
-				system("cls");
-				Go_to_xy(62, 20); cout << "Re? (Y/N)" << endl;
-				Go_to_xy(62, 21); cin >> re;
-				system("cls");
-			}
-
+			Playgame();
 			return 0;
 		}
 		else if (menu_code == 1) {
